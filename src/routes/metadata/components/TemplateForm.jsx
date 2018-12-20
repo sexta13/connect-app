@@ -44,51 +44,31 @@ class TemplateForm extends Component {
     this.confirmDelete = this.confirmDelete.bind(this)
     this.onChangeDropdown = this.onChangeDropdown.bind(this)
     this.onVerifyPrimaryKeyValueChange = this.onVerifyPrimaryKeyValueChange.bind(this)
+    this.init = this.init.bind(this)
   }
 
   componentDidMount() {
-    const { template, templateTypeName } = this.props
-    const name = templateTypeName.includes('Categories') ? templateTypeName.replace('Categories', 'Category') : templateTypeName.substring(0, templateTypeName.length - 1)
-
-    const type = template.hasOwnProperty('id') ? 'number' : 'text'
-    const value = type === 'number' ? template['id'] : template['key']
-
-    this.setState({
-      productCategories: this.props.templateTypeName === 'Product Templates' ? this.getProductCategoryOptions() : [],
-      projectTypes: this.props.templateTypeName === 'Project Templates' ? this.getProjectTypeOptions() : [],
-      name,
-      primaryKeyType: type,
-      primaryKeyValue: value
-    })
+    // this.init(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
-    const { template, templateTypeName } = nextProps
-    const name = templateTypeName.includes('Categories') ? templateTypeName.replace('Categories', 'Category') : templateTypeName.substring(0, templateTypeName.length - 1)
-    const type = template.hasOwnProperty('id') ? 'number' : 'text'
-    const value = type === 'number' ? template['id'] : template['key']
-
-    this.setState({
-      productCategories: this.props.templateTypeName === 'Product Templates' ? this.getProductCategoryOptions() : [],
-      projectTypes: this.props.templateTypeName === 'Project Templates' ? this.getProjectTypeOptions() : [],
-      values:template,
-      name,
-      primaryKeyType: type,
-      primaryKeyValue: value
-    })
+    this.init(nextProps)
   }
 
   componentWillMount() {
-    const { template, templateTypeName } = this.props
-    const name = templateTypeName.includes('Categories') ? templateTypeName.replace('Categories', 'Category') : templateTypeName.substring(0, templateTypeName.length - 1)
+    this.init(this.props)
+  }
 
-    const type = template.hasOwnProperty('id') ? 'number' : 'text'
-    const value = type === 'number' ? template['id'] : template['key']
+  init(props) {
+    const { metadata, metadataType } = props
+    const name = metadataType
+    const type = metadata.hasOwnProperty('id') ? 'number' : 'text'
+    const value = type === 'number' ? metadata['id'] : metadata['key']
 
     this.setState({
-      productCategories: this.props.templateTypeName === 'Product Templates' ? this.getProductCategoryOptions() : [],
-      projectTypes: this.props.templateTypeName === 'Project Templates' ? this.getProjectTypeOptions() : [],
-      values:template,
+      productCategories: metadataType === 'productTemplate' ? this.getProductCategoryOptions() : [],
+      projectTypes: metadataType === 'projectTemplate' ? this.getProjectTypeOptions() : [],
+      values: metadata,
       name,
       primaryKeyType: type,
       primaryKeyValue: value
@@ -117,6 +97,7 @@ class TemplateForm extends Component {
   }
 
   getField(field, isRequired=true) {
+    const { metadata, metadataType } = this.props
     const { values, productCategories, projectTypes } = this.state
     const validations = null
     const type = field['type']
@@ -161,7 +142,7 @@ class TemplateForm extends Component {
             <div className="dropdown-field">
               <SelectDropdown
                 name="category"
-                options={ this.props.templateTypeName === 'Product Templates' ? productCategories : projectTypes}
+                options={ metadataType === 'productTemplate' ? productCategories : projectTypes}
                 theme="default"
                 onSelect={ this.onChangeDropdown }
                 value={value}
@@ -333,7 +314,7 @@ class TemplateForm extends Component {
               disabled={!this.state.valid || !this.state.textAreaValid}
               onClick={this.onSave}
             >
-              Save Changes
+              Save
             </button>
             <button
               type="submit"
@@ -341,7 +322,7 @@ class TemplateForm extends Component {
               onClick={this.onDuplicate}
               disabled={this.props.isNew}
             >
-              Duplicate New {name}
+              Duplicate
             </button>
             <button
               type="submit"
@@ -349,7 +330,7 @@ class TemplateForm extends Component {
               onClick={this.showDelete}
               disabled={this.props.isNew}
             >
-              Delete Current {name}
+              Delete
             </button>
           </div>
         </Formsy.Form>
@@ -404,8 +385,8 @@ TemplateForm.propTypes = {
   fields: PropTypes.array.isRequired,
   productCategories: PropTypes.array.isRequired,
   projectTypes: PropTypes.array.isRequired,
-  template: PropTypes.object.isRequired,
-  templateTypeName: PropTypes.string.isRequired,
+  metadata: PropTypes.object.isRequired,
+  metadataType: PropTypes.string.isRequired,
   deleteTemplate: PropTypes.func.isRequired,
   saveTemplate: PropTypes.func.isRequired,
   changeTemplate: PropTypes.func.isRequired,

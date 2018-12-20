@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import update from 'react-addons-update'
 import ReactJson from 'react-json-view'
-import SelectDropdown from 'appirio-tech-react-components/components/SelectDropdown/SelectDropdown'
 import SpecSection from '../../../projects/detail/components/SpecSection'
 import TemplateForm from './TemplateForm'
 import CoderBroken from '../../../assets/icons/coder-broken.svg'
@@ -24,11 +23,11 @@ class MetaDataPanel extends React.Component {
       template: null,
       isNew: false,
       isProcessing: false,
+      project: {},
+      fields: []
     }
-    this.renderTemplate = this.renderTemplate.bind(this)
     this.renderSection = this.renderSection.bind(this)
     this.onJSONEdit = this.onJSONEdit.bind(this)
-    this.renderCurrentMetadata = this.renderCurrentMetadata.bind(this)
     this.onCreate = this.onCreate.bind(this)
 
     this.onCreateTemplate = this.onCreateTemplate.bind(this)
@@ -39,25 +38,36 @@ class MetaDataPanel extends React.Component {
 
   componentDidMount() {
     document.title = 'Metadata Management - TopCoder'
-    this.setState({
-      project: {
-        details: { appDefinition: {} }, version: 'v2' },
-      dirtyProject: { details: {}, version: 'v2' },
-    })
+    // this.setState({
+    //   project: {
+    //     details: { appDefinition: {} }, version: 'v2' },
+    //   dirtyProject: { details: {}, version: 'v2' },
+    // })
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
+    const { metadata, metadataType } = nextProps
     this.setState({
       project: {
         details: {appDefinition: {}}, version: 'v2'
       },
       dirtyProject: {details: {}, version: 'v2'},
+      fields: this.getFields(metadata, metadataType),
     })
   }
 
   componentWillMount() {
-    if (this.props.templates && (!this.props.templates.productTemplates && !this.props.templates.isLoading)) {
+    const { metadata, metadataType, templates } = this.props
+    if (templates && (!templates.productTemplates && !templates.isLoading)) {
       this.props.loadProjectsMetadata()
+    } else {
+      this.setState({
+        project: {
+          details: {appDefinition: {}}, version: 'v2'
+        },
+        dirtyProject: {details: {}, version: 'v2'},
+        fields: this.getFields(metadata, metadataType),
+      })
     }
   }
 
@@ -85,9 +95,9 @@ class MetaDataPanel extends React.Component {
    */
   getFields(template, currentTemplateTypeValue) {
     const omitKeys = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy']
-    if (currentTemplateTypeValue === 'productTemplates') {
+    if (currentTemplateTypeValue === 'productTemplate') {
       omitKeys.push('template')
-    } else if (currentTemplateTypeValue === 'projectTemplates') {
+    } else if (currentTemplateTypeValue === 'projectTemplate') {
       omitKeys.push('scope')
     }
     const keys = Object.keys(_.omit(template, omitKeys))
@@ -199,7 +209,7 @@ class MetaDataPanel extends React.Component {
   onJSONEdit(updatedObj) {
     console.log(updatedObj)
     const { currentTemplateTypeValue } = this.state
-    if (currentTemplateTypeValue === 'productTemplates') {
+    if (currentTemplateTypeValue === 'productTemplate') {
       this.setState(update(this.state, {
         template: { template : { $set: updatedObj.updated_src } }
       }))
@@ -209,36 +219,6 @@ class MetaDataPanel extends React.Component {
       }))
     }
 
-  }
-
-  renderTemplate(option) {
-    if (option.value !== '') {
-      const { templates } = this.props
-      const { currentTemplateType, currentTemplateTypeValue, primaryKeyName } = this.state
-
-      const dataList = templates[currentTemplateTypeValue]
-      const entity = _.find(dataList, item => item[primaryKeyName] === option.value)
-      let hasTemplate = false
-      if (entity.hasOwnProperty('template')) {
-        hasTemplate = true
-      }
-      if (entity.hasOwnProperty('scope')) {
-        hasTemplate = true
-      }
-      this.setState({
-        template: entity,
-        hasTemplate,
-        isNew: false,
-        currentTemplateName: currentTemplateType.includes('Templates') ? entity.name : entity.displayName
-      })
-    } else {
-      this.setState({
-        template: null,
-        hasTemplate: false,
-        isNew: false,
-        currentTemplateName: ''
-      })
-    }
   }
 
   renderSection(section, idx) {
@@ -268,68 +248,14 @@ class MetaDataPanel extends React.Component {
     )
   }
 
-  renderTemplateTypes(templates) {
-    const types = _.remove(Object.keys(templates), key => key !== 'isLoading' && key !== 'error' && key !== 'isProcessing' && key !== 'metadata')
-    const list = _.map(types, (type) => {
-      return {
-        value: type,
-        title: _.startCase(type)
-      }
-    })
-
-    list.unshift({
-      title: '- Select Type -',
-      value: '',
-    })
-
-    return list
-  }
-
-  renderCurrentMetadata(option) {
-    const { templates } = this.props
-    if (templates[option.value] && templates[option.value].length > 0 ) {
-      const typeName = templates[option.value][0].hasOwnProperty('id') ? 'id' : 'key'
-      const metadataOptions = _.map(templates[option.value], (t) => {
-        if (option.value.includes('Templates')) {
-          return { value: t.id, title: t.name }
-        } else {
-          return { value: t.key, title: t.displayName }
-        }
-      })
-      metadataOptions.unshift({
-        title: '- Select Item -',
-        value: '',
-      })
-      this.setState({
-        fields: this.getFields(templates[option.value][0], option.value),
-        metadataOptions,
-        currentTemplateType: option.title,
-        currentTemplateTypeValue: option.value,
-        primaryKeyName: typeName
-      })
-      this.renderTemplate({
-        title: '- Select Item -',
-        value: ''
-      })
-    } else {
-      this.setState({
-        fields: [],
-        metadataOptions: null,
-        template: null,
-        currentTemplateType: option.title,
-        currentTemplateTypeValue: option.value,
-        primaryKeyName: ''
-      })
-    }
-  }
-
   render() {
-    const { templates, isAdmin } = this.props
-    const { currentTemplateType, currentTemplateName, metadataOptions } = this.state
-    let templateSections = null;
-    if (this.state.template && this.state.hasTemplate){
-      templateSections = this.state.template.hasOwnProperty('template') ? this.state.template.template.questions: this.state.template.scope.sections
-      if (!templateSections) templateSections = [];
+    const { isAdmin, metadataType, metadata, templates } = this.props
+    const { fields } = this.state
+    let templateSections = []
+    if (metadata && metadataType === 'projectTemplate') {
+      templateSections = metadata.scope.sections
+    } else if (metadata && metadataType === 'productTemplate') {
+      templateSections = metadata.template.questions
     }
 
     if (!isAdmin) {
@@ -345,49 +271,29 @@ class MetaDataPanel extends React.Component {
       )
     }
 
-    const metaDataTypes = this.renderTemplateTypes(templates)
     return (
       <div className="meta-data-panel">
         <div className="content">
-          <h5>Metadata Type</h5>
-          <SelectDropdown
-            name="type"
-            options={metaDataTypes}
-            theme="default"
-            onSelect={ this.renderCurrentMetadata }
-          />
-          {
-            metadataOptions && currentTemplateType !== '' && (
-              <div className="input-field">
-                <h5>{this.state.currentTemplateType} List</h5>
-                <SelectDropdown
-                  name="template"
-                  options={ metadataOptions }
-                  onSelect={ this.renderTemplate }
-                  theme="default"
-                  value={currentTemplateName}
-                />
-              </div>
-            )
+
+          { !!metadata && (
+            <TemplateForm
+              metadata={metadata}
+              metadataType={metadataType}
+              deleteTemplate={this.onDeleteTemplate}
+              changeTemplate={this.onChangeTemplate}
+              saveTemplate={this.onSaveTemplate}
+              createTemplate={this.onCreateTemplate}
+              isNew={this.state.isNew}
+              fields={fields}
+              loadProjectMetadata={this.props.loadProjectsMetadata}
+              productCategories={templates['productCategories']}
+              projectTypes={templates['projectTypes']}
+            />)
           }
-          {
-            this.state.currentTemplateType && (
-              <div className="align-left">
-                <button
-                  type="submit"
-                  className="tc-btn tc-btn-primary align-button"
-                  onClick={this.onCreate}
-                  disabled={this.state.isNew}
-                >
-                  Create New {this.state.currentTemplateTypeValue }
-                </button>
-              </div>
-            )
-          }
-          {this.state.template && this.state.hasTemplate && (
+          { metadata && (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1)  && (
             <div>
               <ReactJson
-                src={this.state.template.hasOwnProperty('template') ? this.state.template.template: this.state.template.scope}
+                src={templateSections}
                 theme="rjv-default"
                 onEdit={this.onJSONEdit}
                 onAdd={this.onJSONEdit}
@@ -400,45 +306,24 @@ class MetaDataPanel extends React.Component {
           )
           }
         </div>
-        {
-          this.state.template && (
-            <aside className="filters">
-              {
-                this.state.template && (
-                  <TemplateForm
-                    template={this.state.template}
-                    templateTypeName={currentTemplateType}
-                    deleteTemplate={this.onDeleteTemplate}
-                    changeTemplate={this.onChangeTemplate}
-                    saveTemplate={this.onSaveTemplate}
-                    createTemplate={this.onCreateTemplate}
-                    isNew={this.state.isNew}
-                    fields={this.state.fields}
-                    loadProjectMetadata={this.props.loadProjectsMetadata}
-                    productCategories={this.props.templates['productCategories']}
-                    projectTypes={this.props.templates['projectTypes']}
-                  />)
-                }
-
-                {
-                  //render preview for intake form
-                  this.state.template && this.state.hasTemplate && (
-                    <div className="ProjectWizard">
-                      <div className="FillProjectDetails">
-                      <h1>Template form preview</h1>
-                        <Formsy.Form
-                          ref="form"
-                        >
-                          {templateSections.map(this.renderSection)}
-                        </Formsy.Form>
-                      </div>
-                    </div>
-                  )}
-                )
-              }
-            </aside>
-          )
-        }
+        <aside className="filters">
+            {
+              //render preview for intake form
+              templateSections && (
+                <div className="ProjectWizard">
+                  <div className="FillProjectDetails">
+                  <h1>Template form preview</h1>
+                    <Formsy.Form
+                      ref="form"
+                    >
+                      {templateSections.map(this.renderSection)}
+                    </Formsy.Form>
+                  </div>
+                </div>
+              )}
+            )
+          }
+        </aside>
       </div>
     )
   }
