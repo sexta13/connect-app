@@ -11,8 +11,11 @@
 
     > .content {
       flex: 1;
-      margin-right: 30px;
-      max-width: 340px;
+      margin-right: 20px;
+
+      .ProjectWizard {
+        padding: 10px;
+      }
     }
 
     > .filters {
@@ -20,6 +23,11 @@
       background-color: $tc-white;
       padding: 10px;
       border-radius: 6px;
+      max-width: 340px;
+
+      .json_editor_wrapper {
+        overflow: scroll;
+      }
     }
 
     h5 {
