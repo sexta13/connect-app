@@ -1,17 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Link } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import moment from 'moment'
 import GridView from '../../../components/Grid/GridView'
-// import { PROJECTS_LIST_PER_PAGE } from '../../../../config/constants'
-// import TextTruncate from 'react-text-truncate'
-// import IconProjectStatusTitle from '../../../assets/icons/status-ico.svg'
 
 import './MetaDataProjectTemplatesGridView.scss'
 
-const MetaDataProjectTemplatesGridView = props => {
-  const { totalCount, criteria, pageNum,
+const ProjectTemplatesGridView = props => {
+  const { totalCount, criteria, pageNum, pageSize, sortHandler,
     error, isLoading, infiniteAutoload, setInfiniteAutoload,
     applyFilters, projectTemplates } = props
 
@@ -53,7 +50,7 @@ const MetaDataProjectTemplatesGridView = props => {
     }, {
       id: 'updatedAt',
       headerLabel: 'Updated At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.updatedAt)
@@ -66,7 +63,7 @@ const MetaDataProjectTemplatesGridView = props => {
     }, {
       id: 'createdAt',
       headerLabel: 'Created At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.createdAt)
@@ -89,63 +86,62 @@ const MetaDataProjectTemplatesGridView = props => {
         )
       }
     }, {
-        id: 'hidden',
-        headerLabel: 'Hidden',
-        sortable: false,
-        classes: 'item-hidden-status',
-        renderText: item => {
-          return (
-            <div className="spacing">
-              { item.hidden ? 'Hidden' : 'Visible' }
-            </div>
-          )
-        }
+      id: 'hidden',
+      headerLabel: 'Hidden',
+      sortable: false,
+      classes: 'item-hidden-status',
+      renderText: item => {
+        return (
+          <div className="spacing">
+            { item.hidden ? 'Hidden' : 'Visible' }
+          </div>
+        )
       }
+    }
   ]
-  console.log(projectTemplates)
 
   const gridProps = {
     error,
     isLoading,
     columns,
-    // onPageChange,
-    // sortHandler,
+    onPageChange: () => {}, // dummy, as we are not expecting paging yet in metadata views
+    sortHandler,
     currentSortField,
     resultSet: projectTemplates,
     totalCount,
     currentPageNum: pageNum,
-    pageSize: 50,
+    pageSize,
     infiniteAutoload,
     infiniteScroll: true,
     setInfiniteAutoload,
-    // projectsStatus,
-    applyFilters
+    applyFilters,
+    entityName: 'project template',
+    entityNamePlural: 'project templates'
   }
 
   return (
     <div className="project-templates-grid-view">
-      <button
-        type="button"
-        className="tc-btn tc-btn-primary align-button"
-      >
-        Create
-      </button>
+      <div className="project-templates-actions">
+        <NavLink to="/metadata/new-project-template" className="tc-btn tc-btn-primary align-button">
+          Create
+        </NavLink>
+      </div>
       <GridView {...gridProps} />
     </div>
   )
 }
 
 
-MetaDataProjectTemplatesGridView.propTypes = {
+ProjectTemplatesGridView.propTypes = {
   currentUser: PropTypes.object.isRequired,
   totalCount: PropTypes.number.isRequired,
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired,
-  // onPageChange: PropTypes.func.isRequired,
-  // sortHandler: PropTypes.func.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  sortHandler: PropTypes.func.isRequired,
   pageNum: PropTypes.number.isRequired,
-  // criteria: PropTypes.object.isRequired,
+  criteria: PropTypes.object.isRequired,
   projectTemplates: PropTypes.array.isRequired,
 }
 
-export default MetaDataProjectTemplatesGridView
+export default ProjectTemplatesGridView

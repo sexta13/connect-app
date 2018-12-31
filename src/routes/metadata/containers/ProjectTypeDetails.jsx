@@ -43,27 +43,26 @@ class ProjectTypeDetails extends React.Component {
       createProjectsMetadata,
       updateProjectsMetadata,
       templates,
-      isLoading,
+      // isLoading,
       isAdmin,
-      currentUser,
       match,
     } = this.props
     const projectTypes = templates.projectTypes
-    let key = match.params.key
+    const key = match.params.key
     const projectType = _.find(projectTypes, t => t.key === key)
     return (
-        <div>
-            <MetaDataPanel
-            templates={templates}
-            isAdmin={isAdmin}
-            metadataType="projectType"
-            metadata={projectType}
-            loadProjectsMetadata={loadProjectsMetadata}
-            deleteProjectsMetadata={deleteProjectsMetadata}
-            createProjectsMetadata={createProjectsMetadata}
-            updateProjectsMetadata={updateProjectsMetadata}
-            />
-        </div>
+      <div>
+        <MetaDataPanel
+          templates={templates}
+          isAdmin={isAdmin}
+          metadataType="projectType"
+          metadata={projectType}
+          loadProjectsMetadata={loadProjectsMetadata}
+          deleteProjectsMetadata={deleteProjectsMetadata}
+          createProjectsMetadata={createProjectsMetadata}
+          updateProjectsMetadata={updateProjectsMetadata}
+        />
+      </div>
     )
   }
 }
@@ -83,7 +82,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
   const powerUserRoles = [ROLE_ADMINISTRATOR, ROLE_CONNECT_ADMIN]
 
   return {
-    templates: templates,
+    templates,
     isLoading: templates.isLoading,
     currentUser: loadUser.user,
     isAdmin: _.intersection(loadUser.user.roles, powerUserRoles).length !== 0

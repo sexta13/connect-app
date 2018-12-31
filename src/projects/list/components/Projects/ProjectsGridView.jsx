@@ -198,8 +198,10 @@ const ProjectsGridView = props => {
     infiniteAutoload,
     infiniteScroll: true,
     setInfiniteAutoload,
-    projectsStatus,
-    applyFilters
+    applyFilters,
+    entityName: 'project',
+    entityNamePlural: 'projects',
+    noMoreResultsMessage: `No more ${projectsStatus} projects`
   }
 
   return (

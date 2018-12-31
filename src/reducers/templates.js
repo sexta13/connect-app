@@ -1,15 +1,23 @@
+
+import _ from 'lodash'
+import update from 'react-addons-update'
 import {
   LOAD_PROJECTS_METADATA_PENDING,
   LOAD_PROJECTS_METADATA_SUCCESS,
   ADD_PROJECTS_METADATA_PENDING,
   UPDATE_PROJECTS_METADATA_PENDING,
-  REMOVE_PROJECT_ATTACHMENT_PENDING,
+  REMOVE_PROJECTS_METADATA_PENDING,
   ADD_PROJECTS_METADATA_FAILURE,
   UPDATE_PROJECTS_METADATA_FAILURE,
-  REMOVE_PROJECT_ATTACHMENT_FAILURE,
+  REMOVE_PROJECTS_METADATA_FAILURE,
   ADD_PROJECTS_METADATA_SUCCESS,
   UPDATE_PROJECTS_METADATA_SUCCESS,
   REMOVE_PROJECTS_METADATA_SUCCESS,
+  PROJECT_TEMPLATES_SORT,
+  PRODUCT_TEMPLATES_SORT,
+  CREATE_PROJECT_TEMPLATE_PENDING,
+  CREATE_PROJECT_TEMPLATE_FAILURE,
+  CREATE_PROJECT_TEMPLATE_SUCCESS
 } from '../config/constants'
 import Alert from 'react-s-alert'
 
@@ -20,6 +28,7 @@ export const initialState = {
   productCategories: null,
   milestoneTemplates: null,
   isLoading: false,
+  isRemoving: false,
   error: false,
 }
 
@@ -34,22 +43,28 @@ export default function(state = initialState, action) {
     const { projectTemplates, projectTypes, productTemplates, productCategories, milestoneTemplates } = action.payload
     return {
       ...state,
-      projectTemplates,
+      projectTemplates: _.orderBy(projectTemplates, ['updatedAt'], ['desc']),
       projectTypes,
-      productTemplates,
+      productTemplates: _.orderBy(productTemplates, ['updatedAt'], ['desc']),
       productCategories,
       milestoneTemplates,
       isLoading: false,
     }
   }
   case ADD_PROJECTS_METADATA_PENDING:
+  case CREATE_PROJECT_TEMPLATE_PENDING:
   case UPDATE_PROJECTS_METADATA_PENDING:
-  case REMOVE_PROJECT_ATTACHMENT_PENDING:
     return {
       ...state,
       isLoading: true
     }
+  case REMOVE_PROJECTS_METADATA_PENDING:
+    return {
+      ...state,
+      isRemoving: true
+    }
   case ADD_PROJECTS_METADATA_FAILURE:
+  case CREATE_PROJECT_TEMPLATE_FAILURE:
     Alert.error(`PROJECT METADATA CREATE FAILED: ${action.payload.response.data.result.content.message}`)
     return {
       ...state,
@@ -63,14 +78,15 @@ export default function(state = initialState, action) {
       isLoading: false,
       error: action.payload.response.data.result.content.message
     }
-  case REMOVE_PROJECT_ATTACHMENT_FAILURE:
+  case REMOVE_PROJECTS_METADATA_FAILURE:
     Alert.error(`PROJECT METADATA DELETE FAILED: ${action.payload.response.data.result.content.message}`)
     return {
       ...state,
-      isLoading: false,
+      isRemoving: false,
       error: action.payload.response.data.result.content.message
     }
   case ADD_PROJECTS_METADATA_SUCCESS:
+  case CREATE_PROJECT_TEMPLATE_SUCCESS:
     Alert.success('PROJECT METADATA CREATE SUCCESS')
     return {
       ...state,
@@ -86,14 +102,45 @@ export default function(state = initialState, action) {
       metadata: action.payload,
       error: false,
     }
-  case REMOVE_PROJECTS_METADATA_SUCCESS:
+  case REMOVE_PROJECTS_METADATA_SUCCESS: {
     Alert.success('PROJECT METADATA DELETE SUCCESS')
+    // TODO remove metadata from the state
+    let projectTemplates = state.projectTemplates
+    let productTemplates = state.productTemplates
+    const metadataId = action.payload.metadataId
+    if (action.payload.type === 'projectTemplates') {
+      if (metadataId) {
+        projectTemplates = _.filter(projectTemplates, m => m.id !== metadataId)
+      }
+    }
+    if (action.payload.type === 'productTemplates') {
+      if (metadataId) {
+        productTemplates = _.filter(productTemplates, m => m.id !== metadataId)
+      }
+    }
+    return update (state, {
+      isRemoving: { $set : false },
+      error: { $set : false },
+      projectTemplates: { $set : projectTemplates },
+      productTemplates: { $set : productTemplates }
+    })
+  }
+  case PROJECT_TEMPLATES_SORT: {
+    const fieldName = action.payload.fieldName
+    const order = action.payload.order
     return {
       ...state,
-      isLoading: false,
-      error: false,
-      metadata: null
+      projectTemplates: _.orderBy(state.projectTemplates, [`${fieldName}`], [`${order}`]),
     }
+  }
+  case PRODUCT_TEMPLATES_SORT: {
+    const fieldName = action.payload.fieldName
+    const order = action.payload.order
+    return {
+      ...state,
+      productTemplates: _.orderBy(state.productTemplates, [`${fieldName}`], [`${order}`]),
+    }
+  }
   default: return state
   }
 }

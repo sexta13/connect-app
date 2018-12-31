@@ -5,6 +5,8 @@ import _ from 'lodash'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Modal from 'react-modal'
+import JSONInput from 'react-json-editor-ajrm'
+import locale    from 'react-json-editor-ajrm/locale/en'
 import SelectDropdown from '../../../components/SelectDropdown/SelectDropdown'
 import FormsyForm from 'appirio-tech-react-components/components/Formsy'
 const TCFormFields = FormsyForm.Fields
@@ -60,18 +62,20 @@ class TemplateForm extends Component {
   }
 
   init(props) {
-    const { metadata, metadataType } = props
+    const { metadata, metadataType, isNew } = props
     const name = metadataType
-    const type = metadata.hasOwnProperty('id') ? 'number' : 'text'
-    const value = type === 'number' ? metadata['id'] : metadata['key']
+    const type = metadata && metadata.hasOwnProperty('id') ? 'number' : 'text'
+    let primaryKeyValue = null
+    primaryKeyValue = metadata && metadata.hasOwnProperty('id') ? metadata['id'] : null
+    primaryKeyValue = metadata && !metadata.hasOwnProperty('id') ? metadata['key'] : primaryKeyValue
 
     this.setState({
       productCategories: metadataType === 'productTemplate' ? this.getProductCategoryOptions() : [],
       projectTypes: metadataType === 'projectTemplate' ? this.getProjectTypeOptions() : [],
-      values: metadata,
+      values: isNew && !metadata ? {} : metadata,
       name,
       primaryKeyType: type,
-      primaryKeyValue: value
+      primaryKeyValue
     })
   }
 
@@ -97,7 +101,7 @@ class TemplateForm extends Component {
   }
 
   getField(field, isRequired=true) {
-    const { metadata, metadataType } = this.props
+    const { metadataType } = this.props
     const { values, productCategories, projectTypes } = this.state
     const validations = null
     const type = field['type']
@@ -124,7 +128,7 @@ class TemplateForm extends Component {
       <div className="field" key={label}>
         <div className="label">{`${type !== 'checkbox' ? label : ''}`}</div>
         {
-          type !== 'checkbox' && label !== 'category' && type !== 'object' && (
+          type !== 'checkbox' && label !== 'category' && type !== 'object' && type !== 'json' && (
             <TCFormFields.TextInput
               wrapperClass="input-field"
               type={type}
@@ -174,6 +178,21 @@ class TemplateForm extends Component {
             />
           )
         }
+        {
+          type === 'json' && (
+            <div className="json_editor_wrapper">
+              <JSONInput
+                id={ `${label}JSON` }
+                placeholder ={ value }
+                theme="dark_vscode_tribute"
+                locale={ locale }
+                height="250px"
+                // width='0px'
+                onChange={ (params) => { this.onJSONEdit(field, params) } }
+              />
+            </div>
+          )
+        }
       </div>
     )
   }
@@ -193,6 +212,7 @@ class TemplateForm extends Component {
     const errors = {
       verifyPrimaryKeyValue: null,
     }
+    console.log(state)
 
     if (state.verifyPrimaryKeyValue !== null && state.verifyPrimaryKeyValue !== state.primaryKeyValue.toString()) {
       errors.verifyPrimaryKeyValue = `The ${state.primaryKeyType === 'number' ? 'id' : 'key'} do not match`
@@ -278,10 +298,21 @@ class TemplateForm extends Component {
     }
   }
 
+  onJSONEdit(field, { jsObject }) {
+    const { values } = this.state
+    // const type = field['type']
+    const label = field['key']
+    const updatedJSONValue = {}
+    updatedJSONValue[`${label}`] = jsObject
+    this.setState({
+      values: _.assign({}, values, updatedJSONValue)
+    })
+  }
+
   render() {
     const { fields } = this.props
     const {
-      name,
+      // name,
       showDeleteConfirm,
       primaryKeyType,
       verifyPrimaryKeyValue,

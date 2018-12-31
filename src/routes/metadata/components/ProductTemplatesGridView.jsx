@@ -1,14 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Link } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import moment from 'moment'
 import GridView from '../../../components/Grid/GridView'
 
 import './MetaDataProjectTemplatesGridView.scss'
 
-const MetaDataProductTemplatesGridView = props => {
-  const { totalCount, criteria, pageNum,
+const ProductTemplatesGridView = props => {
+  const { totalCount, criteria, pageNum, pageSize, sortHandler,
     error, isLoading, infiniteAutoload, setInfiniteAutoload,
     applyFilters, productTemplates } = props
 
@@ -50,7 +50,7 @@ const MetaDataProductTemplatesGridView = props => {
     }, {
       id: 'updatedAt',
       headerLabel: 'Updated At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.updatedAt)
@@ -63,7 +63,7 @@ const MetaDataProductTemplatesGridView = props => {
     }, {
       id: 'createdAt',
       headerLabel: 'Created At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.createdAt)
@@ -86,48 +86,53 @@ const MetaDataProductTemplatesGridView = props => {
         )
       }
     }, {
-        id: 'hidden',
-        headerLabel: 'Hidden',
-        sortable: false,
-        classes: 'item-hidden-status',
-        renderText: item => {
-          return (
-            <div className="spacing">
-              { item.hidden ? 'Hidden' : 'Visible' }
-            </div>
-          )
-        }
+      id: 'hidden',
+      headerLabel: 'Hidden',
+      sortable: false,
+      classes: 'item-hidden-status',
+      renderText: item => {
+        return (
+          <div className="spacing">
+            { item.hidden ? 'Hidden' : 'Visible' }
+          </div>
+        )
       }
+    }
   ]
-  console.log(productTemplates)
 
   const gridProps = {
     error,
     isLoading,
     columns,
-    // onPageChange,
-    // sortHandler,
+    onPageChange: () => {}, // dummy, as we are not expecting paging yet in metadata views
+    sortHandler,
     currentSortField,
     resultSet: productTemplates,
     totalCount,
     currentPageNum: pageNum,
-    pageSize: 50,
+    pageSize,
     infiniteAutoload,
     infiniteScroll: true,
     setInfiniteAutoload,
-    // projectsStatus,
-    applyFilters
+    applyFilters,
+    entityName: 'product template',
+    entityNamePlural: 'product templates'
   }
 
   return (
     <div className="project-templates-grid-view">
+      <div className="project-templates-actions">
+        <NavLink to="/metadata/new-product-template" className="tc-btn tc-btn-primary align-button">
+          Create
+        </NavLink>
+      </div>
       <GridView {...gridProps} />
     </div>
   )
 }
 
 
-MetaDataProductTemplatesGridView.propTypes = {
+ProductTemplatesGridView.propTypes = {
   currentUser: PropTypes.object.isRequired,
   totalCount: PropTypes.number.isRequired,
   isLoading: PropTypes.bool.isRequired,
@@ -139,4 +144,4 @@ MetaDataProductTemplatesGridView.propTypes = {
   productTemplates: PropTypes.array.isRequired,
 }
 
-export default MetaDataProductTemplatesGridView
+export default ProductTemplatesGridView

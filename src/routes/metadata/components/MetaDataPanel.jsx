@@ -3,13 +3,13 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import JSONInput from 'react-json-editor-ajrm';
-import locale    from 'react-json-editor-ajrm/locale/en';
+import JSONInput from 'react-json-editor-ajrm'
+import locale    from 'react-json-editor-ajrm/locale/en'
 import _ from 'lodash'
 import update from 'react-addons-update'
 import Sticky from '../../../components/Sticky'
 import MediaQuery from 'react-responsive'
-import ReactJson from 'react-json-view'
+// import ReactJson from 'react-json-view'
 import SpecSection from '../../../projects/detail/components/SpecSection'
 import TemplateForm from './TemplateForm'
 import CoderBroken from '../../../assets/icons/coder-broken.svg'
@@ -31,6 +31,8 @@ class MetaDataPanel extends React.Component {
       project: {},
       fields: []
     }
+    this.init = this.init.bind(this)
+    this.getMetadata = this.getMetadata.bind(this)
     this.renderSection = this.renderSection.bind(this)
     this.onJSONEdit = this.onJSONEdit.bind(this)
     this.onCreate = this.onCreate.bind(this)
@@ -43,81 +45,81 @@ class MetaDataPanel extends React.Component {
 
   componentDidMount() {
     document.title = 'Metadata Management - TopCoder'
-    // this.setState({
-    //   project: {
-    //     details: { appDefinition: {} }, version: 'v2' },
-    //   dirtyProject: { details: {}, version: 'v2' },
-    // })
   }
 
   componentWillReceiveProps(nextProps) {
-    const { metadata, metadataType } = nextProps
+    this.init(nextProps)
+  }
+
+  componentWillMount() {
+    const { templates } = this.props
+    if (templates && (!templates.productTemplates && !templates.isLoading)) {
+      this.props.loadProjectsMetadata()
+    } else {
+      this.init(this.props)
+    }
+  }
+
+  init(props) {
+    const { metadata, metadataType, isNew, templates } = props
     this.setState({
       project: {
         details: {appDefinition: {}}, version: 'v2'
       },
       dirtyProject: {details: {}, version: 'v2'},
       fields: this.getFields(metadata, metadataType),
-      metadata,
+      metadata: this.getMetadata(props),
       metadataType,
+      isNew,
+      isUpdating: templates.isLoading,
     })
   }
 
-  componentWillMount() {
-    const { metadata, metadataType, templates } = this.props
-    if (templates && (!templates.productTemplates && !templates.isLoading)) {
-      this.props.loadProjectsMetadata()
-    } else {
-      this.setState({
-        project: {
-          details: {appDefinition: {}}, version: 'v2'
-        },
-        dirtyProject: {details: {}, version: 'v2'},
-        fields: this.getFields(metadata, metadataType),
-        metadata,
-        metadataType,
-      })
-    }
-  }
-
-  /**
-   * get field type
-   */
-  getFieldType(obj) {
-    const type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
-    switch (type) {
-    case 'boolean':
-      return 'checkbox'
-    case 'string':
-      return 'text'
-    case 'number':
-      return 'number'
-    case 'object':
-      return 'object'
-    default:
-      return type
-    }
-  }
-
-  /**
-   * get all fields of template
-   */
-  getFields(template, currentTemplateTypeValue) {
-    const omitKeys = ['createdAt', 'updatedAt', 'createdBy', 'updatedBy']
-    if (currentTemplateTypeValue === 'productTemplate') {
-      omitKeys.push('template')
-    } else if (currentTemplateTypeValue === 'projectTemplate') {
-      omitKeys.push('scope')
-    }
-    const keys = Object.keys(_.omit(template, omitKeys))
-    const fields = []
-    _.forEach(keys, (key) => {
-      const obj = {
-        key,
-        type: this.getFieldType(template[key])
+  getMetadata(props) {
+    const { metadata, metadataType, isNew } = props
+    const { metadata : dirtyMetadata } = this.state
+    if (isNew && !metadata && !dirtyMetadata) {
+      if (metadataType === 'projectTemplate') {
+        return { scope: {} }
       }
-      fields.push(obj)
-    })
+      if (metadataType === 'productTemplate') {
+        return { template: {} }
+      }
+      return {}
+    }
+    return metadata ? metadata : dirtyMetadata
+  }
+
+  /**
+   * get all fields of metadata
+   */
+  getFields(metadata, metadataType) {
+    let fields = []
+    if (metadataType === 'productTemplate') {
+      fields = fields.concat([
+        { key: 'id', type: 'number' },
+        { key: 'name', type: 'text' },
+        { key: 'productKey', type: 'text' },
+        { key: 'category', type: 'text' },
+        { key: 'subCategory', type: 'text' },
+        { key: 'icon', type: 'text' },
+        { key: 'brief', type: 'text' },
+        { key: 'details', type: 'text' },
+        { key: 'aliases', type: 'array' },
+      ])
+    } else if (metadataType === 'projectTemplate') {
+      fields = fields.concat([
+        { key: 'id', type: 'number' },
+        { key: 'name', type: 'text' },
+        { key: 'key', type: 'text' },
+        { key: 'category', type: 'text' },
+        { key: 'icon', type: 'text' },
+        { key: 'question', type: 'text' },
+        { key: 'info', type: 'text' },
+        { key: 'aliases', type: 'array' },
+        { key: 'phases', type: 'json' },
+      ])
+    }
     return fields
   }
 
@@ -174,7 +176,8 @@ class MetaDataPanel extends React.Component {
         omitKeys.push('aliases')
       }
       const payload = _.omit(data, omitKeys)
-      this.props.updateProjectsMetadata(id, metadataType, payload)
+      const metadataResource = metadataType + 's'
+      this.props.updateProjectsMetadata(id, metadataResource, payload)
         .then((res) => {
           if (!res.error) {
             this.props.loadProjectsMetadata()
@@ -182,10 +185,12 @@ class MetaDataPanel extends React.Component {
         })
     } else {
       const payload = _.omit(data, omitKeys)
-      this.props.createProjectsMetadata(metadataType, payload)
+      // const metadataResource = metadataType + 's'
+      this.props.createProjectsMetadata(payload)
         .then((res) => {
           if (!res.error) {
-            this.props.loadProjectsMetadata()
+            const createdMetadata = res.action.payload
+            window.location = `/metadata/${metadataType}s/${createdMetadata.id}`
           }
         })
     }
@@ -196,10 +201,11 @@ class MetaDataPanel extends React.Component {
    */
   onDeleteTemplate(value) {
     const {metadataType} = this.state
-    this.props.deleteProjectsMetadata(value, metadataType)
+    const metadataResource = metadataType + 's'
+    this.props.deleteProjectsMetadata(value, metadataResource)
       .then((res) => {
         if (!res.error) {
-          this.props.loadProjectsMetadata()
+          window.location = `/metadata/${metadataResource}`
         }
       })
   }
@@ -218,15 +224,13 @@ class MetaDataPanel extends React.Component {
   onJSONEdit({ jsObject }) {
     const { metadataType } = this.state
     if (metadataType === 'productTemplate') {
-      this.setState(update(this.state, {
-        metadata: { template : { questions : { $set: jsObject } } }
-      }))
-    } else {
-      this.setState(update(this.state, {
-        metadata: { scope : { sections : { $set: jsObject } } }
-      }))
+      const updateQuery = { template : { $set : jsObject } }
+      this.setState(update(this.state, { metadata: updateQuery }))
     }
-
+    if (metadataType === 'projectTemplate') {
+      const updateQuery = { scope : { $set : jsObject } }
+      this.setState(update(this.state, { metadata: updateQuery }))
+    }
   }
 
   renderSection(section, idx) {
@@ -258,13 +262,17 @@ class MetaDataPanel extends React.Component {
 
   render() {
     const { isAdmin, metadataType, templates } = this.props
-    const { fields, metadata } = this.state
+    const { fields, metadata, isNew } = this.state
+    let template = {}
     let templateSections = []
-    if (metadata && metadataType === 'projectTemplate') {
-      templateSections = metadata.scope.sections
-    } else if (metadata && metadataType === 'productTemplate') {
-      templateSections = metadata.template.questions
+    if (metadata && metadataType === 'projectTemplate' && metadata.scope) {
+      template = metadata.scope
+      templateSections = template.sections
+    } else if (metadata && metadataType === 'productTemplate' && metadata.template) {
+      template = metadata.template
+      templateSections = template.questions
     }
+    // console.log(templates)
 
     if (!isAdmin) {
       return (
@@ -283,66 +291,65 @@ class MetaDataPanel extends React.Component {
       <div className="meta-data-panel">
         <div className="content">
           {
-              //render preview for intake form
-              templateSections && (
-                <div className="ProjectWizard">
-                  <div className="FillProjectDetails">
+            //render preview for intake form
+            templateSections && (
+              <div className="ProjectWizard">
+                <div className="FillProjectDetails">
                   <h1>Template form preview</h1>
-                    <Formsy.Form
-                      ref="form"
-                    >
-                      {templateSections.map(this.renderSection)}
-                    </Formsy.Form>
-                  </div>
+                  <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
+                    <Sticky top={110}>
+                      <Formsy.Form
+                        ref="form"
+                      >
+                        {templateSections.map(this.renderSection)}
+                      </Formsy.Form>
+                    </Sticky>
+                  </MediaQuery>
                 </div>
-              )}
+              </div>
             )
           }
         </div>
         <aside className="filters">
-          <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
-            <Sticky top={110}>
-              { metadata && (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1)  && (
-                <div className="json_editor_wrapper">
-                  <JSONInput
-                      id='templateJSON'
-                      placeholder ={ templateSections }
-                      theme='dark_vscode_tribute'
-                      locale={ locale }
-                      height='450px'
-                      // width='0px'
-                      onChange={this.onJSONEdit}
-                  />
-                  {/* <ReactJson
-                    src={templateSections}
-                    theme="rjv-default"
-                    onEdit={this.onJSONEdit}
-                    onAdd={this.onJSONEdit}
-                    onDelete={this.onJSONEdit}
-                    collapsed={3}
-                    indentWidth={2}
-                    collapseStringsAfterLength={20}
-                  /> */}
-                </div>
-              )
-              }
-              { !!metadata && (
-                <TemplateForm
-                  metadata={metadata}
-                  metadataType={metadataType}
-                  deleteTemplate={this.onDeleteTemplate}
-                  changeTemplate={this.onChangeTemplate}
-                  saveTemplate={this.onSaveTemplate}
-                  createTemplate={this.onCreateTemplate}
-                  isNew={this.state.isNew}
-                  fields={fields}
-                  loadProjectMetadata={this.props.loadProjectsMetadata}
-                  productCategories={templates['productCategories']}
-                  projectTypes={templates['projectTypes']}
-                />)
-              }
-              </Sticky>
-            </MediaQuery>
+          { (metadata || isNew) && (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1)  && (
+            <div className="json_editor_wrapper">
+              <JSONInput
+                id="templateJSON"
+                placeholder ={ template }
+                theme="dark_vscode_tribute"
+                locale={ locale }
+                height="450px"
+                // width='0px'
+                onChange={this.onJSONEdit}
+              />
+              {/* <ReactJson
+                src={template}
+                theme="rjv-default"
+                onEdit={this.onJSONEdit}
+                onAdd={this.onJSONEdit}
+                onDelete={this.onJSONEdit}
+                collapsed={3}
+                indentWidth={2}
+                collapseStringsAfterLength={20}
+              /> */}
+            </div>
+          )
+          }
+          { !templates.isLoading && (!!metadata || isNew ) && (
+            <TemplateForm
+              metadata={metadata}
+              metadataType={metadataType}
+              deleteTemplate={this.onDeleteTemplate}
+              changeTemplate={this.onChangeTemplate}
+              saveTemplate={this.onSaveTemplate}
+              createTemplate={this.onCreateTemplate}
+              isNew={isNew}
+              fields={fields}
+              loadProjectMetadata={this.props.loadProjectsMetadata}
+              productCategories={templates['productCategories']}
+              projectTypes={templates['projectTypes']}
+            />)
+          }
         </aside>
       </div>
     )

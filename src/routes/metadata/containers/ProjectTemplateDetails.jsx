@@ -10,8 +10,8 @@ import {
   loadProjectsMetadata,
   saveProductTemplate,
   deleteProjectsMetadata,
-  createProjectsMetadata,
   updateProjectsMetadata,
+  createProjectTemplate,
 } from '../../../actions/templates'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import CoderBot from '../../../components/CoderBot/CoderBot'
@@ -41,32 +41,31 @@ class ProjectTemplateDetails extends React.Component {
     const {
       loadProjectsMetadata,
       deleteProjectsMetadata,
-      createProjectsMetadata,
+      createProjectTemplate,
       updateProjectsMetadata,
       templates,
-      isLoading,
+      // isLoading,
       isAdmin,
-      currentUser,
       match,
     } = this.props
     const projectTemplates = templates.projectTemplates
     let templateId = match.params.templateId
     templateId = templateId ? parseInt(templateId) : null
     const projectTemplate = _.find(projectTemplates, t => t.id === templateId)
-    console.log(projectTemplate)
     return (
-        <div>
-            <MetaDataPanel
-            templates={templates}
-            isAdmin={isAdmin}
-            metadataType="projectTemplate"
-            metadata={projectTemplate}
-            loadProjectsMetadata={loadProjectsMetadata}
-            deleteProjectsMetadata={deleteProjectsMetadata}
-            createProjectsMetadata={createProjectsMetadata}
-            updateProjectsMetadata={updateProjectsMetadata}
-            />
-        </div>
+      <div>
+        <MetaDataPanel
+          templates={templates}
+          isAdmin={isAdmin}
+          metadataType="projectTemplate"
+          metadata={projectTemplate}
+          loadProjectsMetadata={loadProjectsMetadata}
+          deleteProjectsMetadata={deleteProjectsMetadata}
+          createProjectsMetadata={createProjectTemplate}
+          updateProjectsMetadata={updateProjectsMetadata}
+          isNew={!templateId}
+        />
+      </div>
     )
   }
 }
@@ -77,7 +76,7 @@ ProjectTemplateDetails.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
   deleteProjectsMetadata: PropTypes.func.isRequired,
-  createProjectsMetadata: PropTypes.func.isRequired,
+  createProjectTemplate: PropTypes.func.isRequired,
   updateProjectsMetadata: PropTypes.func.isRequired,
 }
 
@@ -86,8 +85,10 @@ const mapStateToProps = ({ templates, loadUser }) => {
   const powerUserRoles = [ROLE_ADMINISTRATOR, ROLE_CONNECT_ADMIN]
 
   return {
-    templates: templates,
+    templates,
     isLoading: templates.isLoading,
+    isRemoving: templates.isRemoving,
+    error: templates.error,
     currentUser: loadUser.user,
     isAdmin: _.intersection(loadUser.user.roles, powerUserRoles).length !== 0
   }
@@ -97,7 +98,7 @@ const mapDispatchToProps = {
   loadProjectsMetadata,
   saveProductTemplate,
   deleteProjectsMetadata,
-  createProjectsMetadata,
+  createProjectTemplate,
   updateProjectsMetadata,
 }
 
@@ -106,8 +107,8 @@ const page500 = compose(
 )
 const showErrorMessageIfError = hasLoaded =>
   branch(hasLoaded, renderComponent(page500(CoderBot)), t => t)
-const errorHandler = showErrorMessageIfError(props => props.error)
-const enhance = spinnerWhileLoading(props => !props.isLoading || props.templates)
+const errorHandler = showErrorMessageIfError(props => props.errorTemp)
+const enhance = spinnerWhileLoading(props => !props.isLoading && !props.isRemoving)
 const ProjectTemplateDetailsWithLoaderEnhanced = enhance(errorHandler(ProjectTemplateDetails))
 const ProjectTemplateDetailsWithLoaderAndAuth = requiresAuthentication(ProjectTemplateDetailsWithLoaderEnhanced)
 

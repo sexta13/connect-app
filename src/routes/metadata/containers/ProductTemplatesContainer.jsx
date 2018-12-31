@@ -8,10 +8,9 @@ import { withRouter } from 'react-router-dom'
 import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  sortProductTemplates,
 } from '../../../actions/templates'
-import MetaDataProductTemplatesGridView from '../components/MetaDataProductTemplatesGridView'
+import ProductTemplatesGridView from '../components/ProductTemplatesGridView'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import CoderBot from '../../../components/CoderBot/CoderBot'
 import { requiresAuthentication } from '../../../components/AuthenticatedComponent'
@@ -20,6 +19,7 @@ import {
   ROLE_CONNECT_ADMIN,
 } from '../../../config/constants'
 import _ from 'lodash'
+import CoderBroken from '../../../assets/icons/coder-broken.svg'
 
 import './MetaDataContainer.scss'
 
@@ -27,6 +27,9 @@ class ProductTemplatesContainer extends React.Component {
 
   constructor(props) {
     super(props)
+    this.state = { criteria : { sort: 'updatedAt desc' } }
+
+    this.sortHandler = this.sortHandler.bind(this)
   }
 
   componentWillMount() {
@@ -35,28 +38,45 @@ class ProductTemplatesContainer extends React.Component {
     }
   }
 
+  sortHandler(fieldName) {
+    this.props.sortProductTemplates(fieldName)
+    this.setState({ criteria : { sort: fieldName } })
+  }
+
   render() {
     const {
-      deleteProjectsMetadata,
-      createProjectsMetadata,
-      updateProjectsMetadata,
       templates,
       isLoading,
       isAdmin,
       currentUser,
+      error,
     } = this.props
-    console.log('render of ProductTemplatesContainer')
+    const { criteria } = this.state
+    if (!isAdmin) {
+      return (
+        <section className="content content-error">
+          <div className="container">
+            <div className="page-error">
+              <CoderBroken className="icon-coder-broken" />
+              <span>You don't have permission to access Metadata Management</span>
+            </div>
+          </div>
+        </section>
+      )
+    }
     return (
-        <div>
-            <MetaDataProductTemplatesGridView
-            currentUser={currentUser}
-            isLoading={isLoading}
-            totalCount={templates ? templates.length : 0}
-            pageNum={1}
-            productTemplates={templates}
-            criteria={{ sort: 'createdAt' }}
-            />
-        </div>
+      <div>
+        <ProductTemplatesGridView
+          currentUser={currentUser}
+          isLoading={isLoading}
+          totalCount={templates ? templates.length : 0}
+          pageNum={1}
+          productTemplates={templates}
+          criteria={criteria}
+          sortHandler={this.sortHandler}
+          error={error}
+        />
+      </div>
     )
   }
 }
@@ -66,7 +86,7 @@ class ProductTemplatesContainer extends React.Component {
 ProductTemplatesContainer.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
-  deleteProjectsMetadata: PropTypes.func.isRequired,
+  sortProductTemplates: PropTypes.func.isRequired,
 }
 
 
@@ -83,8 +103,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
 
 const mapDispatchToProps = {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  sortProductTemplates,
 }
 
 const page500 = compose(

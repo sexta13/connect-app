@@ -15,15 +15,17 @@ import ProductTemplateDetails from './containers/ProductTemplateDetails'
 import ProjectTypesContainer from './containers/ProjectTypesContainer'
 import ProductTemplatesContainer from './containers/ProductTemplatesContainer'
 import { requiresAuthentication } from '../../components/AuthenticatedComponent'
-import ProjectTypeDetails from './containers/ProjectTypeDetails';
+import ProjectTypeDetails from './containers/ProjectTypeDetails'
 
 const MetaDataLayoutWithAuth = requiresAuthentication(MetaDataLayout)
 
 const MetaDataContainerWithAuth = withProps({ main:
   <Switch>
     <Route exact path="/metadata/projectTemplates" component={ProjectTemplatesContainer} />
+    <Route path="/metadata/new-project-template" render={ProjectTemplateDetails} />
     <Route path="/metadata/projectTemplates/:templateId" render={ProjectTemplateDetails} />
     <Route exact path="/metadata/productTemplates" component={ProductTemplatesContainer} />
+    <Route path="/metadata/new-product-template" render={ProductTemplateDetails} />
     <Route path="/metadata/productTemplates/:templateId" render={ProductTemplateDetails} />
     <Route exact path="/metadata/projectTypes" component={ProjectTypesContainer} />
     <Route path="/metadata/projectTypes/:key" render={ProjectTypeDetails} />

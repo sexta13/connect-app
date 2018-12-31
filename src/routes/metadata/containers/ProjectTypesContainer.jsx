@@ -8,8 +8,6 @@ import { withRouter } from 'react-router-dom'
 import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
 } from '../../../actions/templates'
 import MetaDataProjectTypesGridView from '../components/MetaDataProjectTypesGridView'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
@@ -20,6 +18,7 @@ import {
   ROLE_CONNECT_ADMIN,
 } from '../../../config/constants'
 import _ from 'lodash'
+import CoderBroken from '../../../assets/icons/coder-broken.svg'
 
 import './MetaDataContainer.scss'
 
@@ -37,25 +36,34 @@ class ProjectTypesContainer extends React.Component {
 
   render() {
     const {
-      deleteProjectsMetadata,
-      createProjectsMetadata,
-      updateProjectsMetadata,
       projectTypes,
       isLoading,
       isAdmin,
       currentUser,
     } = this.props
+    if (!isAdmin) {
       return (
-        <div>
-          <MetaDataProjectTypesGridView
-            currentUser={currentUser}
-            isLoading={isLoading}
-            totalCount={projectTypes ? projectTypes.length : 0}
-            pageNum={1}
-            projectTypes={projectTypes}
-            criteria={{ sort: 'createdAt' }}
-          />
-        </div>
+        <section className="content content-error">
+          <div className="container">
+            <div className="page-error">
+              <CoderBroken className="icon-coder-broken" />
+              <span>You don't have permission to access Metadata Management</span>
+            </div>
+          </div>
+        </section>
+      )
+    }
+    return (
+      <div>
+        <MetaDataProjectTypesGridView
+          currentUser={currentUser}
+          isLoading={isLoading}
+          totalCount={projectTypes ? projectTypes.length : 0}
+          pageNum={1}
+          projectTypes={projectTypes}
+          criteria={{ sort: 'createdAt' }}
+        />
+      </div>
     )
   }
 }
@@ -65,7 +73,6 @@ class ProjectTypesContainer extends React.Component {
 ProjectTypesContainer.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
-  deleteProjectsMetadata: PropTypes.func.isRequired,
 }
 
 
@@ -82,8 +89,6 @@ const mapStateToProps = ({ templates, loadUser }) => {
 
 const mapDispatchToProps = {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
 }
 
 const page500 = compose(

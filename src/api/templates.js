@@ -54,6 +54,6 @@ export function deleteProjectsMetadata(metadataId, type) {
   const path = type !== 'milestoneTemplates' ? 'projects' : 'timelines'
   return axios.delete(`${TC_API_URL}/v4/${path}/metadata/${type}/${metadataId}`)
     .then(() => {
-      return metadataId
+      return { metadataId, type }
     })
 }

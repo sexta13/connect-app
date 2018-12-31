@@ -44,9 +44,8 @@ class ProductTemplateDetails extends React.Component {
       createProjectsMetadata,
       updateProjectsMetadata,
       templates,
-      isLoading,
+      // isLoading,
       isAdmin,
-      currentUser,
       match,
     } = this.props
     const productTemplates = templates.productTemplates
@@ -55,18 +54,19 @@ class ProductTemplateDetails extends React.Component {
     const productTemplate = _.find(productTemplates, t => t.id === templateId)
     console.log(productTemplate)
     return (
-        <div>
-            <MetaDataPanel
-            templates={templates}
-            isAdmin={isAdmin}
-            metadataType="productTemplate"
-            metadata={productTemplate}
-            loadProjectsMetadata={loadProjectsMetadata}
-            deleteProjectsMetadata={deleteProjectsMetadata}
-            createProjectsMetadata={createProjectsMetadata}
-            updateProjectsMetadata={updateProjectsMetadata}
-            />
-        </div>
+      <div>
+        <MetaDataPanel
+          templates={templates}
+          isAdmin={isAdmin}
+          metadataType="productTemplate"
+          metadata={productTemplate}
+          loadProjectsMetadata={loadProjectsMetadata}
+          deleteProjectsMetadata={deleteProjectsMetadata}
+          createProjectsMetadata={createProjectsMetadata}
+          updateProjectsMetadata={updateProjectsMetadata}
+          isNew={!templateId}
+        />
+      </div>
     )
   }
 }
@@ -86,8 +86,10 @@ const mapStateToProps = ({ templates, loadUser }) => {
   const powerUserRoles = [ROLE_ADMINISTRATOR, ROLE_CONNECT_ADMIN]
 
   return {
-    templates: templates,
+    templates,
     isLoading: templates.isLoading,
+    isRemoving: templates.isRemoving,
+    error: templates.error,
     currentUser: loadUser.user,
     isAdmin: _.intersection(loadUser.user.roles, powerUserRoles).length !== 0
   }
@@ -107,7 +109,7 @@ const page500 = compose(
 const showErrorMessageIfError = hasLoaded =>
   branch(hasLoaded, renderComponent(page500(CoderBot)), t => t)
 const errorHandler = showErrorMessageIfError(props => props.error)
-const enhance = spinnerWhileLoading(props => !props.isLoading || props.templates)
+const enhance = spinnerWhileLoading(props => !props.isLoading && !props.isRemoving)
 const ProductTemplateDetailsWithLoaderEnhanced = enhance(errorHandler(ProductTemplateDetails))
 const ProductTemplateDetailsWithLoaderAndAuth = requiresAuthentication(ProductTemplateDetailsWithLoaderEnhanced)
 

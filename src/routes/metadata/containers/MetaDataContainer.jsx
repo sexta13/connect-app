@@ -35,10 +35,6 @@ class MetaDataContainer extends React.Component {
     super(props)
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return true
-  }
-
   componentWillMount() {
     if (this.props.templates && !this.props.templates.projectTemplates && !this.props.templates.isLoading) {
       this.props.loadProjectsMetadata()

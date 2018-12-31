@@ -5,6 +5,13 @@ $screen-one-column: 720px;
 
 :global {
     .project-templates-grid-view {
+
+        .project-templates-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            margin: 10px 20px;
+        }
         .flex-data {
             .flex-row {
                 .item-id {

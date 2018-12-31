@@ -86,18 +86,18 @@ const MetaDataProjectTypesGridView = props => {
         )
       }
     }, {
-        id: 'hidden',
-        headerLabel: 'Hidden',
-        sortable: false,
-        classes: 'item-hidden-status',
-        renderText: item => {
-          return (
-            <div className="spacing">
-              { item.hidden ? 'Hidden' : 'Visible' }
-            </div>
-          )
-        }
+      id: 'hidden',
+      headerLabel: 'Hidden',
+      sortable: false,
+      classes: 'item-hidden-status',
+      renderText: item => {
+        return (
+          <div className="spacing">
+            { item.hidden ? 'Hidden' : 'Visible' }
+          </div>
+        )
       }
+    }
   ]
   console.log(projectTypes)
 

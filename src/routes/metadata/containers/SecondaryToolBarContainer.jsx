@@ -19,10 +19,10 @@ const SecondaryToolBarContainer = ({
 
   // choose set of menu links based on the project version
   const navLinks = [
-    { label: 'Project Templates', to: `/metadata/projectTemplates` },
-    { label: 'Product Templates', to: `/metadata/productTemplates` },
-    { label: 'Project Types', to: `/metadata/projectTypes` },
-    { label: 'Product Categories', to: `/metadata/productCategories` },
+    { label: 'Project Templates', to: '/metadata/projectTemplates' },
+    { label: 'Product Templates', to: '/metadata/productTemplates' },
+    { label: 'Project Types', to: '/metadata/projectTypes' },
+    { label: 'Product Categories', to: '/metadata/productCategories' },
   ]
 
   return (

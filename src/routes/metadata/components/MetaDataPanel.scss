@@ -15,6 +15,10 @@
 
       .ProjectWizard {
         padding: 10px;
+        
+        .section-footer {
+          margin-top: 0px;// resets the negative margin which is used in actual rendering
+        }
       }
     }
 
