@@ -106,6 +106,8 @@ class MetaDataPanel extends React.Component {
         { key: 'brief', type: 'text' },
         { key: 'details', type: 'text' },
         { key: 'aliases', type: 'array' },
+        { key: 'disabled', type: 'checkbox' },
+        { key: 'hidden', type: 'checkbox' },
       ])
     } else if (metadataType === 'projectTemplate') {
       fields = fields.concat([
@@ -118,6 +120,20 @@ class MetaDataPanel extends React.Component {
         { key: 'info', type: 'text' },
         { key: 'aliases', type: 'array' },
         { key: 'phases', type: 'json' },
+        { key: 'disabled', type: 'checkbox' },
+        { key: 'hidden', type: 'checkbox' },
+      ])
+    } else if (metadataType === 'projectType') {
+      fields = fields.concat([
+        { key: 'key', type: 'text' },
+        { key: 'displayName', type: 'text' },
+        { key: 'icon', type: 'text' },
+        { key: 'question', type: 'text' },
+        { key: 'info', type: 'text' },
+        { key: 'aliases', type: 'array' },
+        { key: 'metadata', type: 'json' },
+        { key: 'disabled', type: 'checkbox' },
+        { key: 'hidden', type: 'checkbox' },
       ])
     }
     return fields
@@ -185,12 +201,16 @@ class MetaDataPanel extends React.Component {
         })
     } else {
       const payload = _.omit(data, omitKeys)
-      // const metadataResource = metadataType + 's'
+      const metadataResource = metadataType + 's'
       this.props.createProjectsMetadata(payload)
         .then((res) => {
           if (!res.error) {
             const createdMetadata = res.action.payload
-            window.location = `/metadata/${metadataType}s/${createdMetadata.id}`
+            if (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1) {
+              window.location = `/metadata/${metadataResource}/${createdMetadata.id}`
+            } else {
+              window.location = `/metadata/${metadataResource}/${createdMetadata.key}`
+            }
           }
         })
     }
@@ -265,12 +285,15 @@ class MetaDataPanel extends React.Component {
     const { fields, metadata, isNew } = this.state
     let template = {}
     let templateSections = []
+    let needTemplatePreview = false
     if (metadata && metadataType === 'projectTemplate' && metadata.scope) {
       template = metadata.scope
       templateSections = template.sections
+      needTemplatePreview = true
     } else if (metadata && metadataType === 'productTemplate' && metadata.template) {
       template = metadata.template
       templateSections = template.questions
+      needTemplatePreview = true
     }
     // console.log(templates)
 
@@ -289,7 +312,8 @@ class MetaDataPanel extends React.Component {
 
     return (
       <div className="meta-data-panel">
-        <div className="content">
+        { needTemplatePreview && 
+          <div className="content">
           {
             //render preview for intake form
             templateSections && (
@@ -309,7 +333,8 @@ class MetaDataPanel extends React.Component {
               </div>
             )
           }
-        </div>
+          </div>
+        }
         <aside className="filters">
           { (metadata || isNew) && (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1)  && (
             <div className="json_editor_wrapper">

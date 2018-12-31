@@ -28,6 +28,7 @@ const MetaDataContainerWithAuth = withProps({ main:
     <Route path="/metadata/new-product-template" render={ProductTemplateDetails} />
     <Route path="/metadata/productTemplates/:templateId" render={ProductTemplateDetails} />
     <Route exact path="/metadata/projectTypes" component={ProjectTypesContainer} />
+    <Route path="/metadata/new-project-type" render={ProjectTypeDetails} />
     <Route path="/metadata/projectTypes/:key" render={ProjectTypeDetails} />
     <Route render={() => <CoderBot code={404}/>} />
   </Switch>

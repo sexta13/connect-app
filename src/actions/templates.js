@@ -5,7 +5,8 @@
 import _ from 'lodash'
 import {
   LOAD_PROJECTS_METADATA, ADD_PROJECTS_METADATA, UPDATE_PROJECTS_METADATA, REMOVE_PROJECTS_METADATA,
-  PROJECT_TEMPLATES_SORT, PRODUCT_TEMPLATES_SORT, CREATE_PROJECT_TEMPLATE
+  PROJECT_TEMPLATES_SORT, PRODUCT_TEMPLATES_SORT, PROJECT_TYPES_SORT, CREATE_PROJECT_TEMPLATE, CREATE_PROJECT_TYPE,
+  CREATE_PRODUCT_TEMPLATE
 } from '../config/constants'
 import {
   getProjectsMetadata,
@@ -58,6 +59,24 @@ export function createProjectTemplate(data) {
   }
 }
 
+export function createProductTemplate(data) {
+  return (dispatch) => {
+    return dispatch({
+      type: CREATE_PRODUCT_TEMPLATE,
+      payload: createProjectsMetadataAPI('productTemplates', data)
+    })
+  }
+}
+
+export function createProjectType(data) {
+  return (dispatch) => {
+    return dispatch({
+      type: CREATE_PROJECT_TYPE,
+      payload: createProjectsMetadataAPI('projectTypes', data)
+    })
+  }
+}
+
 export function updateProjectsMetadata(metadataId, type, data) {
   return (dispatch) => {
     return dispatch({
@@ -95,6 +114,18 @@ export function sortProductTemplates(criteria) {
     
     return dispatch({
       type: PRODUCT_TEMPLATES_SORT,
+      payload: { fieldName, order }
+    })
+  }
+}
+
+export function sortProjectTypes(criteria) {
+  return (dispatch) => {
+    const fieldName = _.split(criteria, ' ')[0]
+    const order = _.split(criteria, ' ')[1] || 'asc'
+    
+    return dispatch({
+      type: PROJECT_TYPES_SORT,
       payload: { fieldName, order }
     })
   }

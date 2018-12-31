@@ -15,9 +15,16 @@ import {
   REMOVE_PROJECTS_METADATA_SUCCESS,
   PROJECT_TEMPLATES_SORT,
   PRODUCT_TEMPLATES_SORT,
+  PROJECT_TYPES_SORT,
   CREATE_PROJECT_TEMPLATE_PENDING,
   CREATE_PROJECT_TEMPLATE_FAILURE,
-  CREATE_PROJECT_TEMPLATE_SUCCESS
+  CREATE_PROJECT_TEMPLATE_SUCCESS,
+  CREATE_PRODUCT_TEMPLATE_PENDING,
+  CREATE_PROJECT_TYPE_PENDING,
+  CREATE_PRODUCT_TEMPLATE_FAILURE,
+  CREATE_PROJECT_TYPE_FAILURE,
+  CREATE_PRODUCT_TEMPLATE_SUCCESS,
+  CREATE_PROJECT_TYPE_SUCCESS
 } from '../config/constants'
 import Alert from 'react-s-alert'
 
@@ -44,7 +51,7 @@ export default function(state = initialState, action) {
     return {
       ...state,
       projectTemplates: _.orderBy(projectTemplates, ['updatedAt'], ['desc']),
-      projectTypes,
+      projectTypes: _.orderBy(projectTypes, ['updatedAt'], ['desc']),
       productTemplates: _.orderBy(productTemplates, ['updatedAt'], ['desc']),
       productCategories,
       milestoneTemplates,
@@ -53,6 +60,8 @@ export default function(state = initialState, action) {
   }
   case ADD_PROJECTS_METADATA_PENDING:
   case CREATE_PROJECT_TEMPLATE_PENDING:
+  case CREATE_PRODUCT_TEMPLATE_PENDING:
+  case CREATE_PROJECT_TYPE_PENDING:
   case UPDATE_PROJECTS_METADATA_PENDING:
     return {
       ...state,
@@ -65,6 +74,8 @@ export default function(state = initialState, action) {
     }
   case ADD_PROJECTS_METADATA_FAILURE:
   case CREATE_PROJECT_TEMPLATE_FAILURE:
+  case CREATE_PRODUCT_TEMPLATE_FAILURE:
+  case CREATE_PROJECT_TYPE_FAILURE:
     Alert.error(`PROJECT METADATA CREATE FAILED: ${action.payload.response.data.result.content.message}`)
     return {
       ...state,
@@ -87,6 +98,8 @@ export default function(state = initialState, action) {
     }
   case ADD_PROJECTS_METADATA_SUCCESS:
   case CREATE_PROJECT_TEMPLATE_SUCCESS:
+  case CREATE_PRODUCT_TEMPLATE_SUCCESS:
+  case CREATE_PROJECT_TYPE_SUCCESS:
     Alert.success('PROJECT METADATA CREATE SUCCESS')
     return {
       ...state,
@@ -139,6 +152,14 @@ export default function(state = initialState, action) {
     return {
       ...state,
       productTemplates: _.orderBy(state.productTemplates, [`${fieldName}`], [`${order}`]),
+    }
+  }
+  case PROJECT_TYPES_SORT: {
+    const fieldName = action.payload.fieldName
+    const order = action.payload.order
+    return {
+      ...state,
+      projectTypes: _.orderBy(state.projectTypes, [`${fieldName}`], [`${order}`]),
     }
   }
   default: return state

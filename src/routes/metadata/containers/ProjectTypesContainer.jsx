@@ -8,8 +8,9 @@ import { withRouter } from 'react-router-dom'
 import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
+  sortProjectTypes
 } from '../../../actions/templates'
-import MetaDataProjectTypesGridView from '../components/MetaDataProjectTypesGridView'
+import ProjectTypesGridView from '../components/ProjectTypesGridView'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import CoderBot from '../../../components/CoderBot/CoderBot'
 import { requiresAuthentication } from '../../../components/AuthenticatedComponent'
@@ -26,6 +27,9 @@ class ProjectTypesContainer extends React.Component {
 
   constructor(props) {
     super(props)
+    this.state = { criteria : { sort: 'updatedAt desc' } }
+
+    this.sortHandler = this.sortHandler.bind(this)
   }
 
   componentWillMount() {
@@ -34,13 +38,20 @@ class ProjectTypesContainer extends React.Component {
     }
   }
 
+  sortHandler(fieldName) {
+    this.props.sortProjectTypes(fieldName)
+    this.setState({ criteria : { sort: fieldName } })
+  }
+
   render() {
     const {
       projectTypes,
       isLoading,
       isAdmin,
       currentUser,
+      error,
     } = this.props
+    const { criteria } = this.state
     if (!isAdmin) {
       return (
         <section className="content content-error">
@@ -55,13 +66,16 @@ class ProjectTypesContainer extends React.Component {
     }
     return (
       <div>
-        <MetaDataProjectTypesGridView
+        <ProjectTypesGridView
           currentUser={currentUser}
           isLoading={isLoading}
           totalCount={projectTypes ? projectTypes.length : 0}
           pageNum={1}
+          pageSize={projectTypes ? projectTypes.length : 0}
           projectTypes={projectTypes}
-          criteria={{ sort: 'createdAt' }}
+          criteria={criteria}
+          sortHandler={this.sortHandler}
+          error={error}
         />
       </div>
     )
@@ -82,6 +96,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
   return {
     projectTypes: templates.projectTypes,
     isLoading: templates.isLoading,
+    error: templates.error,
     currentUser: loadUser.user,
     isAdmin: _.intersection(loadUser.user.roles, powerUserRoles).length !== 0
   }
@@ -89,6 +104,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
 
 const mapDispatchToProps = {
   loadProjectsMetadata,
+  sortProjectTypes,
 }
 
 const page500 = compose(

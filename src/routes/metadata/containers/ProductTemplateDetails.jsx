@@ -10,8 +10,8 @@ import {
   loadProjectsMetadata,
   saveProductTemplate,
   deleteProjectsMetadata,
-  createProjectsMetadata,
   updateProjectsMetadata,
+  createProductTemplate,
 } from '../../../actions/templates'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import CoderBot from '../../../components/CoderBot/CoderBot'
@@ -41,7 +41,7 @@ class ProductTemplateDetails extends React.Component {
     const {
       loadProjectsMetadata,
       deleteProjectsMetadata,
-      createProjectsMetadata,
+      createProductTemplate,
       updateProjectsMetadata,
       templates,
       // isLoading,
@@ -62,7 +62,7 @@ class ProductTemplateDetails extends React.Component {
           metadata={productTemplate}
           loadProjectsMetadata={loadProjectsMetadata}
           deleteProjectsMetadata={deleteProjectsMetadata}
-          createProjectsMetadata={createProjectsMetadata}
+          createProjectsMetadata={createProductTemplate}
           updateProjectsMetadata={updateProjectsMetadata}
           isNew={!templateId}
         />
@@ -77,7 +77,7 @@ ProductTemplateDetails.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
   deleteProjectsMetadata: PropTypes.func.isRequired,
-  createProjectsMetadata: PropTypes.func.isRequired,
+  createProductTemplate: PropTypes.func.isRequired,
   updateProjectsMetadata: PropTypes.func.isRequired,
 }
 
@@ -99,7 +99,7 @@ const mapDispatchToProps = {
   loadProjectsMetadata,
   saveProductTemplate,
   deleteProjectsMetadata,
-  createProjectsMetadata,
+  createProductTemplate,
   updateProjectsMetadata,
 }
 

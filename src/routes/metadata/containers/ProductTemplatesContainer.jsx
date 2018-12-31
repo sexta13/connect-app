@@ -71,6 +71,7 @@ class ProductTemplatesContainer extends React.Component {
           isLoading={isLoading}
           totalCount={templates ? templates.length : 0}
           pageNum={1}
+          pageSize={templates ? templates.length : 0}
           productTemplates={templates}
           criteria={criteria}
           sortHandler={this.sortHandler}

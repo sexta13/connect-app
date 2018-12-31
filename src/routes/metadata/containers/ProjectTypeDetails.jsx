@@ -9,7 +9,7 @@ import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
   deleteProjectsMetadata,
-  createProjectsMetadata,
+  createProjectType,
   updateProjectsMetadata,
 } from '../../../actions/templates'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
@@ -40,7 +40,7 @@ class ProjectTypeDetails extends React.Component {
     const {
       loadProjectsMetadata,
       deleteProjectsMetadata,
-      createProjectsMetadata,
+      createProjectType,
       updateProjectsMetadata,
       templates,
       // isLoading,
@@ -59,8 +59,9 @@ class ProjectTypeDetails extends React.Component {
           metadata={projectType}
           loadProjectsMetadata={loadProjectsMetadata}
           deleteProjectsMetadata={deleteProjectsMetadata}
-          createProjectsMetadata={createProjectsMetadata}
+          createProjectsMetadata={createProjectType}
           updateProjectsMetadata={updateProjectsMetadata}
+          isNew={!key}
         />
       </div>
     )
@@ -73,7 +74,7 @@ ProjectTypeDetails.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
   deleteProjectsMetadata: PropTypes.func.isRequired,
-  createProjectsMetadata: PropTypes.func.isRequired,
+  createProjectType: PropTypes.func.isRequired,
   updateProjectsMetadata: PropTypes.func.isRequired,
 }
 
@@ -84,6 +85,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
   return {
     templates,
     isLoading: templates.isLoading,
+    isRemoving: templates.isRemoving,
     currentUser: loadUser.user,
     isAdmin: _.intersection(loadUser.user.roles, powerUserRoles).length !== 0
   }
@@ -92,7 +94,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
 const mapDispatchToProps = {
   loadProjectsMetadata,
   deleteProjectsMetadata,
-  createProjectsMetadata,
+  createProjectType,
   updateProjectsMetadata,
 }
 
@@ -102,7 +104,7 @@ const page500 = compose(
 const showErrorMessageIfError = hasLoaded =>
   branch(hasLoaded, renderComponent(page500(CoderBot)), t => t)
 const errorHandler = showErrorMessageIfError(props => props.error)
-const enhance = spinnerWhileLoading(props => !props.isLoading || props.templates)
+const enhance = spinnerWhileLoading(props => !props.isLoading && !props.isRemoving)
 const ProjectTypeDetailsWithLoaderEnhanced = enhance(errorHandler(ProjectTypeDetails))
 const ProjectTypeDetailsWithLoaderAndAuth = requiresAuthentication(ProjectTypeDetailsWithLoaderEnhanced)
 

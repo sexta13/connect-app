@@ -1,14 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Link } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import moment from 'moment'
 import GridView from '../../../components/Grid/GridView'
 
 import './MetaDataProjectTemplatesGridView.scss'
 
-const MetaDataProjectTypesGridView = props => {
-  const { totalCount, criteria, pageNum,
+const ProjectTypesGridView = props => {
+  const { totalCount, criteria, pageNum, sortHandler,
     error, isLoading, infiniteAutoload, setInfiniteAutoload,
     applyFilters, projectTypes } = props
 
@@ -50,7 +50,7 @@ const MetaDataProjectTypesGridView = props => {
     }, {
       id: 'updatedAt',
       headerLabel: 'Updated At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.updatedAt)
@@ -63,7 +63,7 @@ const MetaDataProjectTypesGridView = props => {
     }, {
       id: 'createdAt',
       headerLabel: 'Created At',
-      sortable: false,
+      sortable: true,
       classes: 'item-status-date',
       renderText: item => {
         const time = moment(item.createdAt)
@@ -99,14 +99,13 @@ const MetaDataProjectTypesGridView = props => {
       }
     }
   ]
-  console.log(projectTypes)
 
   const gridProps = {
     error,
     isLoading,
     columns,
-    // onPageChange,
-    // sortHandler,
+    onPageChange: () => {}, // dummy, as we are not expecting paging yet in metadata views
+    sortHandler,
     currentSortField,
     resultSet: projectTypes,
     totalCount,
@@ -115,19 +114,25 @@ const MetaDataProjectTypesGridView = props => {
     infiniteAutoload,
     infiniteScroll: true,
     setInfiniteAutoload,
-    // projectsStatus,
-    applyFilters
+    applyFilters,
+    entityName: 'project types',
+    entityNamePlural: 'project types'
   }
 
   return (
     <div className="project-templates-grid-view">
+      <div className="project-templates-actions">
+        <NavLink to="/metadata/new-project-type" className="tc-btn tc-btn-primary align-button">
+          Create
+        </NavLink>
+      </div>
       <GridView {...gridProps} />
     </div>
   )
 }
 
 
-MetaDataProjectTypesGridView.propTypes = {
+ProjectTypesGridView.propTypes = {
   currentUser: PropTypes.object.isRequired,
   totalCount: PropTypes.number.isRequired,
   isLoading: PropTypes.bool.isRequired,
@@ -139,4 +144,4 @@ MetaDataProjectTypesGridView.propTypes = {
   projectTypes: PropTypes.array.isRequired,
 }
 
-export default MetaDataProjectTypesGridView
+export default ProjectTypesGridView
