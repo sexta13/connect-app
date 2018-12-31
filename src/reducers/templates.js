@@ -31,7 +31,13 @@ import {
   REMOVE_PROJECT_TYPE_FAILURE,
   REMOVE_PRODUCT_CATEGORY_SUCCESS,
   REMOVE_PROJECT_TYPE_SUCCESS,
-  PRODUCT_CATEGORIES_SORT
+  PRODUCT_CATEGORIES_SORT,
+  REMOVE_PROJECT_TEMPLATE_SUCCESS,
+  REMOVE_PRODUCT_TEMPLATE_SUCCESS,
+  REMOVE_PROJECT_TEMPLATE_FAILURE,
+  REMOVE_PRODUCT_TEMPLATE_FAILURE,
+  REMOVE_PROJECT_TEMPLATE_PENDING,
+  REMOVE_PRODUCT_TEMPLATE_PENDING
 } from '../config/constants'
 import Alert from 'react-s-alert'
 
@@ -77,6 +83,8 @@ export default function(state = initialState, action) {
   case REMOVE_PROJECTS_METADATA_PENDING:
   case REMOVE_PRODUCT_CATEGORY_PENDING:
   case REMOVE_PROJECT_TYPE_PENDING:
+  case REMOVE_PROJECT_TEMPLATE_PENDING:
+  case REMOVE_PRODUCT_TEMPLATE_PENDING:
     return {
       ...state,
       isRemoving: true
@@ -101,6 +109,8 @@ export default function(state = initialState, action) {
   case REMOVE_PROJECTS_METADATA_FAILURE:
   case REMOVE_PRODUCT_CATEGORY_FAILURE:
   case REMOVE_PROJECT_TYPE_FAILURE:
+  case REMOVE_PROJECT_TEMPLATE_FAILURE:
+  case REMOVE_PRODUCT_TEMPLATE_FAILURE:
     Alert.error(`PROJECT METADATA DELETE FAILED: ${action.payload.response.data.result.content.message}`)
     return {
       ...state,
@@ -128,26 +138,33 @@ export default function(state = initialState, action) {
     }
   case REMOVE_PROJECTS_METADATA_SUCCESS:
   case REMOVE_PRODUCT_CATEGORY_SUCCESS:
-  case REMOVE_PROJECT_TYPE_SUCCESS: {
+  case REMOVE_PROJECT_TYPE_SUCCESS:
+  case REMOVE_PROJECT_TEMPLATE_SUCCESS: {
     Alert.success('PROJECT METADATA DELETE SUCCESS')
     // TODO remove metadata from the state
     let projectTemplates = state.projectTemplates
-    let productTemplates = state.productTemplates
     const metadataId = action.payload.metadataId
     if (action.payload.type === 'projectTemplates') {
       if (metadataId) {
         projectTemplates = _.filter(projectTemplates, m => m.id !== metadataId)
       }
     }
-    if (action.payload.type === 'productTemplates') {
-      if (metadataId) {
-        productTemplates = _.filter(productTemplates, m => m.id !== metadataId)
-      }
+    return update (state, {
+      isRemoving: { $set : false },
+      error: { $set : false },
+      projectTemplates: { $set : projectTemplates }
+    })
+  }
+  case REMOVE_PRODUCT_TEMPLATE_SUCCESS: {
+    Alert.success('PRODUCT DELETE SUCCESS')
+    let productTemplates = state.productTemplates
+    const metadataId = action.payload.metadataId
+    if (metadataId) {
+      productTemplates = _.filter(productTemplates, m => m.id !== metadataId)
     }
     return update (state, {
       isRemoving: { $set : false },
       error: { $set : false },
-      projectTemplates: { $set : projectTemplates },
       productTemplates: { $set : productTemplates }
     })
   }

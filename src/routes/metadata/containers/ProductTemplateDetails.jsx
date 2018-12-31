@@ -8,8 +8,7 @@ import { withRouter } from 'react-router-dom'
 import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  deleteProductTemplate,
   updateProjectsMetadata,
   createProductTemplate,
 } from '../../../actions/templates'
@@ -40,7 +39,7 @@ class ProductTemplateDetails extends React.Component {
   render() {
     const {
       loadProjectsMetadata,
-      deleteProjectsMetadata,
+      deleteProductTemplate,
       createProductTemplate,
       updateProjectsMetadata,
       templates,
@@ -52,7 +51,6 @@ class ProductTemplateDetails extends React.Component {
     let templateId = match.params.templateId
     templateId = templateId ? parseInt(templateId) : null
     const productTemplate = _.find(productTemplates, t => t.id === templateId)
-    console.log(productTemplate)
     return (
       <div>
         <MetaDataPanel
@@ -61,7 +59,7 @@ class ProductTemplateDetails extends React.Component {
           metadataType="productTemplate"
           metadata={productTemplate}
           loadProjectsMetadata={loadProjectsMetadata}
-          deleteProjectsMetadata={deleteProjectsMetadata}
+          deleteProjectsMetadata={deleteProductTemplate}
           createProjectsMetadata={createProductTemplate}
           updateProjectsMetadata={updateProjectsMetadata}
           isNew={!templateId}
@@ -76,7 +74,7 @@ class ProductTemplateDetails extends React.Component {
 ProductTemplateDetails.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
-  deleteProjectsMetadata: PropTypes.func.isRequired,
+  deleteProductTemplate: PropTypes.func.isRequired,
   createProductTemplate: PropTypes.func.isRequired,
   updateProjectsMetadata: PropTypes.func.isRequired,
 }
@@ -97,8 +95,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
 
 const mapDispatchToProps = {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  deleteProductTemplate,
   createProductTemplate,
   updateProjectsMetadata,
 }

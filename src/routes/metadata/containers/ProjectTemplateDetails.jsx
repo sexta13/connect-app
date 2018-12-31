@@ -8,8 +8,7 @@ import { withRouter } from 'react-router-dom'
 import { branch, renderComponent, compose, withProps } from 'recompose'
 import {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  deleteProjectTemplate,
   updateProjectsMetadata,
   createProjectTemplate,
 } from '../../../actions/templates'
@@ -40,7 +39,7 @@ class ProjectTemplateDetails extends React.Component {
   render() {
     const {
       loadProjectsMetadata,
-      deleteProjectsMetadata,
+      deleteProjectTemplate,
       createProjectTemplate,
       updateProjectsMetadata,
       templates,
@@ -60,7 +59,7 @@ class ProjectTemplateDetails extends React.Component {
           metadataType="projectTemplate"
           metadata={projectTemplate}
           loadProjectsMetadata={loadProjectsMetadata}
-          deleteProjectsMetadata={deleteProjectsMetadata}
+          deleteProjectsMetadata={deleteProjectTemplate}
           createProjectsMetadata={createProjectTemplate}
           updateProjectsMetadata={updateProjectsMetadata}
           isNew={!templateId}
@@ -75,7 +74,7 @@ class ProjectTemplateDetails extends React.Component {
 ProjectTemplateDetails.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   loadProjectsMetadata: PropTypes.func.isRequired,
-  deleteProjectsMetadata: PropTypes.func.isRequired,
+  deleteProjectTemplate: PropTypes.func.isRequired,
   createProjectTemplate: PropTypes.func.isRequired,
   updateProjectsMetadata: PropTypes.func.isRequired,
 }
@@ -96,8 +95,7 @@ const mapStateToProps = ({ templates, loadUser }) => {
 
 const mapDispatchToProps = {
   loadProjectsMetadata,
-  saveProductTemplate,
-  deleteProjectsMetadata,
+  deleteProjectTemplate,
   createProjectTemplate,
   updateProjectsMetadata,
 }

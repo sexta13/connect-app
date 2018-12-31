@@ -10,7 +10,9 @@ import {
   PRODUCT_CATEGORIES_SORT,
   CREATE_PRODUCT_CATEGORY,
   REMOVE_PROJECT_TYPE,
-  REMOVE_PRODUCT_CATEGORY
+  REMOVE_PRODUCT_CATEGORY,
+  REMOVE_PROJECT_TEMPLATE,
+  REMOVE_PRODUCT_TEMPLATE
 } from '../config/constants'
 import {
   getProjectsMetadata,
@@ -108,11 +110,29 @@ export function deleteProjectsMetadata(metadataId, type) {
   }
 }
 
+export function deleteProjectTemplate(metadataId) {
+  return (dispatch) => {
+    return dispatch({
+      type: REMOVE_PROJECT_TEMPLATE,
+      payload: deleteProjectsMetadataAPI(metadataId, 'projectTemplates')
+    })
+  }
+}
+
 export function deleteProjectType(metadataId) {
   return (dispatch) => {
     return dispatch({
       type: REMOVE_PROJECT_TYPE,
       payload: deleteProjectsMetadataAPI(metadataId, 'projectTypes')
+    })
+  }
+}
+
+export function deleteProductTemplate(metadataId) {
+  return (dispatch) => {
+    return dispatch({
+      type: REMOVE_PRODUCT_TEMPLATE,
+      payload: deleteProjectsMetadataAPI(metadataId, 'productTemplates')
     })
   }
 }
