@@ -314,25 +314,25 @@ class MetaDataPanel extends React.Component {
       <div className="meta-data-panel">
         { needTemplatePreview && 
           <div className="content">
-          {
-            //render preview for intake form
-            templateSections && (
-              <div className="ProjectWizard">
-                <div className="FillProjectDetails">
-                  <h1>Template form preview</h1>
-                  <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
-                    <Sticky top={110}>
-                      <Formsy.Form
-                        ref="form"
-                      >
-                        {templateSections.map(this.renderSection)}
-                      </Formsy.Form>
-                    </Sticky>
-                  </MediaQuery>
+            {
+              //render preview for intake form
+              templateSections && (
+                <div className="ProjectWizard">
+                  <div className="FillProjectDetails">
+                    <h1>Template form preview</h1>
+                    <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
+                      <Sticky top={110}>
+                        <Formsy.Form
+                          ref="form"
+                        >
+                          {templateSections.map(this.renderSection)}
+                        </Formsy.Form>
+                      </Sticky>
+                    </MediaQuery>
+                  </div>
                 </div>
-              </div>
-            )
-          }
+              )
+            }
           </div>
         }
         <aside className="filters">
