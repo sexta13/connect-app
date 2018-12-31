@@ -33,6 +33,7 @@ class MetaDataPanel extends React.Component {
     }
     this.init = this.init.bind(this)
     this.getMetadata = this.getMetadata.bind(this)
+    this.getResourceNameFromType = this.getResourceNameFromType.bind(this)
     this.renderSection = this.renderSection.bind(this)
     this.onJSONEdit = this.onJSONEdit.bind(this)
     this.onCreate = this.onCreate.bind(this)
@@ -90,6 +91,13 @@ class MetaDataPanel extends React.Component {
     return metadata ? metadata : dirtyMetadata
   }
 
+  getResourceNameFromType(type) {
+    if (type === 'productCategory') {
+      return 'productCategories'
+    }
+    return type + 's'
+  }
+
   /**
    * get all fields of metadata
    */
@@ -132,6 +140,18 @@ class MetaDataPanel extends React.Component {
         { key: 'info', type: 'text' },
         { key: 'aliases', type: 'array' },
         { key: 'metadata', type: 'json' },
+        { key: 'disabled', type: 'checkbox' },
+        { key: 'hidden', type: 'checkbox' },
+      ])
+    } else if (metadataType === 'productCategory') {
+      fields = fields.concat([
+        { key: 'key', type: 'text' },
+        { key: 'displayName', type: 'text' },
+        { key: 'icon', type: 'text' },
+        { key: 'question', type: 'text' },
+        { key: 'info', type: 'text' },
+        { key: 'aliases', type: 'array' },
+        // { key: 'metadata', type: 'json' },
         { key: 'disabled', type: 'checkbox' },
         { key: 'hidden', type: 'checkbox' },
       ])
@@ -192,7 +212,7 @@ class MetaDataPanel extends React.Component {
         omitKeys.push('aliases')
       }
       const payload = _.omit(data, omitKeys)
-      const metadataResource = metadataType + 's'
+      const metadataResource = this.getResourceNameFromType(metadataType)
       this.props.updateProjectsMetadata(id, metadataResource, payload)
         .then((res) => {
           if (!res.error) {
@@ -201,7 +221,7 @@ class MetaDataPanel extends React.Component {
         })
     } else {
       const payload = _.omit(data, omitKeys)
-      const metadataResource = metadataType + 's'
+      const metadataResource = this.getResourceNameFromType(metadataType)
       this.props.createProjectsMetadata(payload)
         .then((res) => {
           if (!res.error) {
@@ -221,7 +241,7 @@ class MetaDataPanel extends React.Component {
    */
   onDeleteTemplate(value) {
     const {metadataType} = this.state
-    const metadataResource = metadataType + 's'
+    const metadataResource = this.getResourceNameFromType(metadataType)
     this.props.deleteProjectsMetadata(value, metadataResource)
       .then((res) => {
         if (!res.error) {

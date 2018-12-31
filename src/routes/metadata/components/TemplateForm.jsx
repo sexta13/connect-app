@@ -212,7 +212,6 @@ class TemplateForm extends Component {
     const errors = {
       verifyPrimaryKeyValue: null,
     }
-    console.log(state)
 
     if (state.verifyPrimaryKeyValue !== null && state.verifyPrimaryKeyValue !== state.primaryKeyValue.toString()) {
       errors.verifyPrimaryKeyValue = `The ${state.primaryKeyType === 'number' ? 'id' : 'key'} do not match`

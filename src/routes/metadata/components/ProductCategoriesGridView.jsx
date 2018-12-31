@@ -7,10 +7,10 @@ import GridView from '../../../components/Grid/GridView'
 
 import './MetaDataProjectTemplatesGridView.scss'
 
-const ProjectTemplatesGridView = props => {
+const ProductCategoriesGridView = props => {
   const { totalCount, criteria, pageNum, pageSize, sortHandler,
     error, isLoading, infiniteAutoload, setInfiniteAutoload,
-    applyFilters, projectTemplates } = props
+    applyFilters, productCategories } = props
 
   const currentSortField = _.get(criteria, 'sort', '')
   // This 'little' array is the heart of the list component.
@@ -18,31 +18,31 @@ const ProjectTemplatesGridView = props => {
   // how they should be displayed.
   const columns = [
     {
-      id: 'id',
-      headerLabel: 'ID',
-      classes: 'item-id',
+      id: 'key',
+      headerLabel: 'Key',
+      classes: 'item-key',
       sortable: false,
       renderText: item => {
-        const url = `/metadata/projectTemplates/${item.id}`
+        const url = `/metadata/productCategories/${item.key}`
         const recentlyCreated = moment().diff(item.createdAt, 'seconds') < 3600
         return (
           <Link to={url} className="spacing">
             {recentlyCreated && <span className="blue-border" />}
-            {item.id}
+            {item.key}
           </Link>
         )
       }
     }, {
-      id: 'templateName',
-      headerLabel: 'Template',
+      id: 'displayName',
+      headerLabel: 'Display Name',
       classes: 'item-project-templates',
       sortable: false,
       renderText: item => {
-        const url = `/metadata/projectTemplates/${item.id}`
+        const url = `/metadata/productCategories/${item.key}`
         return (
           <div className="spacing project-template-container">
             <div className="template-title">
-              <Link to={url} className="link-title">{_.unescape(item.name)}</Link>
+              <Link to={url} className="link-title">{_.unescape(item.displayName)}</Link>
             </div>
           </div>
         )
@@ -107,7 +107,7 @@ const ProjectTemplatesGridView = props => {
     onPageChange: () => {}, // dummy, as we are not expecting paging yet in metadata views
     sortHandler,
     currentSortField,
-    resultSet: projectTemplates,
+    resultSet: productCategories,
     totalCount,
     currentPageNum: pageNum,
     pageSize,
@@ -115,14 +115,14 @@ const ProjectTemplatesGridView = props => {
     infiniteScroll: true,
     setInfiniteAutoload,
     applyFilters,
-    entityName: 'project template',
-    entityNamePlural: 'project templates'
+    entityName: 'product category',
+    entityNamePlural: 'product categories'
   }
 
   return (
     <div className="project-templates-grid-view">
       <div className="project-templates-actions">
-        <NavLink to="/metadata/new-project-template" className="tc-btn tc-btn-primary align-button">
+        <NavLink to="/metadata/new-product-category" className="tc-btn tc-btn-primary align-button">
           Create
         </NavLink>
       </div>
@@ -132,7 +132,7 @@ const ProjectTemplatesGridView = props => {
 }
 
 
-ProjectTemplatesGridView.propTypes = {
+ProductCategoriesGridView.propTypes = {
   currentUser: PropTypes.object.isRequired,
   totalCount: PropTypes.number.isRequired,
   isLoading: PropTypes.bool.isRequired,
@@ -141,7 +141,7 @@ ProjectTemplatesGridView.propTypes = {
   sortHandler: PropTypes.func.isRequired,
   pageNum: PropTypes.number.isRequired,
   criteria: PropTypes.object.isRequired,
-  projectTemplates: PropTypes.array.isRequired,
+  productCategories: PropTypes.array.isRequired,
 }
 
-export default ProjectTemplatesGridView
+export default ProductCategoriesGridView

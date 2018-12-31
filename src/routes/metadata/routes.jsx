@@ -13,9 +13,11 @@ import ProjectTemplatesContainer from './containers/ProjectTemplatesContainer'
 import ProjectTemplateDetails from './containers/ProjectTemplateDetails'
 import ProductTemplateDetails from './containers/ProductTemplateDetails'
 import ProjectTypesContainer from './containers/ProjectTypesContainer'
-import ProductTemplatesContainer from './containers/ProductTemplatesContainer'
-import { requiresAuthentication } from '../../components/AuthenticatedComponent'
 import ProjectTypeDetails from './containers/ProjectTypeDetails'
+import ProductTemplatesContainer from './containers/ProductTemplatesContainer'
+import ProductCategoriesContainer from './containers/ProductCategoriesContainer'
+import ProductCategoryDetails from './containers/ProductCategoryDetails'
+import { requiresAuthentication } from '../../components/AuthenticatedComponent'
 
 const MetaDataLayoutWithAuth = requiresAuthentication(MetaDataLayout)
 
@@ -30,6 +32,9 @@ const MetaDataContainerWithAuth = withProps({ main:
     <Route exact path="/metadata/projectTypes" component={ProjectTypesContainer} />
     <Route path="/metadata/new-project-type" render={ProjectTypeDetails} />
     <Route path="/metadata/projectTypes/:key" render={ProjectTypeDetails} />
+    <Route exact path="/metadata/productCategories" component={ProductCategoriesContainer} />
+    <Route path="/metadata/new-product-category" render={ProductCategoryDetails} />
+    <Route path="/metadata/productCategories/:key" render={ProductCategoryDetails} />
     <Route render={() => <CoderBot code={404}/>} />
   </Switch>
 })(MetaDataLayoutWithAuth)

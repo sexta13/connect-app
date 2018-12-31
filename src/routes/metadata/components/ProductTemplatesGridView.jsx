@@ -138,9 +138,9 @@ ProductTemplatesGridView.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired,
   // onPageChange: PropTypes.func.isRequired,
-  // sortHandler: PropTypes.func.isRequired,
+  sortHandler: PropTypes.func.isRequired,
   pageNum: PropTypes.number.isRequired,
-  // criteria: PropTypes.object.isRequired,
+  criteria: PropTypes.object.isRequired,
   productTemplates: PropTypes.array.isRequired,
 }
 

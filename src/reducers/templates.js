@@ -24,7 +24,14 @@ import {
   CREATE_PRODUCT_TEMPLATE_FAILURE,
   CREATE_PROJECT_TYPE_FAILURE,
   CREATE_PRODUCT_TEMPLATE_SUCCESS,
-  CREATE_PROJECT_TYPE_SUCCESS
+  CREATE_PROJECT_TYPE_SUCCESS,
+  REMOVE_PRODUCT_CATEGORY_PENDING,
+  REMOVE_PROJECT_TYPE_PENDING,
+  REMOVE_PRODUCT_CATEGORY_FAILURE,
+  REMOVE_PROJECT_TYPE_FAILURE,
+  REMOVE_PRODUCT_CATEGORY_SUCCESS,
+  REMOVE_PROJECT_TYPE_SUCCESS,
+  PRODUCT_CATEGORIES_SORT
 } from '../config/constants'
 import Alert from 'react-s-alert'
 
@@ -53,7 +60,7 @@ export default function(state = initialState, action) {
       projectTemplates: _.orderBy(projectTemplates, ['updatedAt'], ['desc']),
       projectTypes: _.orderBy(projectTypes, ['updatedAt'], ['desc']),
       productTemplates: _.orderBy(productTemplates, ['updatedAt'], ['desc']),
-      productCategories,
+      productCategories: _.orderBy(productCategories, ['updatedAt'], ['desc']),
       milestoneTemplates,
       isLoading: false,
     }
@@ -68,6 +75,8 @@ export default function(state = initialState, action) {
       isLoading: true
     }
   case REMOVE_PROJECTS_METADATA_PENDING:
+  case REMOVE_PRODUCT_CATEGORY_PENDING:
+  case REMOVE_PROJECT_TYPE_PENDING:
     return {
       ...state,
       isRemoving: true
@@ -90,6 +99,8 @@ export default function(state = initialState, action) {
       error: action.payload.response.data.result.content.message
     }
   case REMOVE_PROJECTS_METADATA_FAILURE:
+  case REMOVE_PRODUCT_CATEGORY_FAILURE:
+  case REMOVE_PROJECT_TYPE_FAILURE:
     Alert.error(`PROJECT METADATA DELETE FAILED: ${action.payload.response.data.result.content.message}`)
     return {
       ...state,
@@ -115,7 +126,9 @@ export default function(state = initialState, action) {
       metadata: action.payload,
       error: false,
     }
-  case REMOVE_PROJECTS_METADATA_SUCCESS: {
+  case REMOVE_PROJECTS_METADATA_SUCCESS:
+  case REMOVE_PRODUCT_CATEGORY_SUCCESS:
+  case REMOVE_PROJECT_TYPE_SUCCESS: {
     Alert.success('PROJECT METADATA DELETE SUCCESS')
     // TODO remove metadata from the state
     let projectTemplates = state.projectTemplates
@@ -160,6 +173,14 @@ export default function(state = initialState, action) {
     return {
       ...state,
       projectTypes: _.orderBy(state.projectTypes, [`${fieldName}`], [`${order}`]),
+    }
+  }
+  case PRODUCT_CATEGORIES_SORT: {
+    const fieldName = action.payload.fieldName
+    const order = action.payload.order
+    return {
+      ...state,
+      productCategories: _.orderBy(state.productCategories, [`${fieldName}`], [`${order}`]),
     }
   }
   default: return state

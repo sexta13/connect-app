@@ -6,7 +6,11 @@ import _ from 'lodash'
 import {
   LOAD_PROJECTS_METADATA, ADD_PROJECTS_METADATA, UPDATE_PROJECTS_METADATA, REMOVE_PROJECTS_METADATA,
   PROJECT_TEMPLATES_SORT, PRODUCT_TEMPLATES_SORT, PROJECT_TYPES_SORT, CREATE_PROJECT_TEMPLATE, CREATE_PROJECT_TYPE,
-  CREATE_PRODUCT_TEMPLATE
+  CREATE_PRODUCT_TEMPLATE,
+  PRODUCT_CATEGORIES_SORT,
+  CREATE_PRODUCT_CATEGORY,
+  REMOVE_PROJECT_TYPE,
+  REMOVE_PRODUCT_CATEGORY
 } from '../config/constants'
 import {
   getProjectsMetadata,
@@ -77,6 +81,15 @@ export function createProjectType(data) {
   }
 }
 
+export function createProductCategory(data) {
+  return (dispatch) => {
+    return dispatch({
+      type: CREATE_PRODUCT_CATEGORY,
+      payload: createProjectsMetadataAPI('productCategories', data)
+    })
+  }
+}
+
 export function updateProjectsMetadata(metadataId, type, data) {
   return (dispatch) => {
     return dispatch({
@@ -91,6 +104,24 @@ export function deleteProjectsMetadata(metadataId, type) {
     return dispatch({
       type: REMOVE_PROJECTS_METADATA,
       payload: deleteProjectsMetadataAPI(metadataId, type)
+    })
+  }
+}
+
+export function deleteProjectType(metadataId) {
+  return (dispatch) => {
+    return dispatch({
+      type: REMOVE_PROJECT_TYPE,
+      payload: deleteProjectsMetadataAPI(metadataId, 'projectTypes')
+    })
+  }
+}
+
+export function deleteProductCategory(metadataId) {
+  return (dispatch) => {
+    return dispatch({
+      type: REMOVE_PRODUCT_CATEGORY,
+      payload: deleteProjectsMetadataAPI(metadataId, 'productCategories')
     })
   }
 }
@@ -126,6 +157,18 @@ export function sortProjectTypes(criteria) {
     
     return dispatch({
       type: PROJECT_TYPES_SORT,
+      payload: { fieldName, order }
+    })
+  }
+}
+
+export function sortProductCategories(criteria) {
+  return (dispatch) => {
+    const fieldName = _.split(criteria, ' ')[0]
+    const order = _.split(criteria, ' ')[1] || 'asc'
+    
+    return dispatch({
+      type: PRODUCT_CATEGORIES_SORT,
       payload: { fieldName, order }
     })
   }

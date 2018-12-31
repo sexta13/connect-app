@@ -8,7 +8,7 @@ import GridView from '../../../components/Grid/GridView'
 import './MetaDataProjectTemplatesGridView.scss'
 
 const ProjectTypesGridView = props => {
-  const { totalCount, criteria, pageNum, sortHandler,
+  const { totalCount, criteria, pageNum, pageSize, sortHandler,
     error, isLoading, infiniteAutoload, setInfiniteAutoload,
     applyFilters, projectTypes } = props
 
@@ -20,7 +20,7 @@ const ProjectTypesGridView = props => {
     {
       id: 'key',
       headerLabel: 'Key',
-      classes: 'item-id',
+      classes: 'item-key',
       sortable: false,
       renderText: item => {
         const url = `/metadata/projectTypes/${item.key}`
@@ -110,12 +110,12 @@ const ProjectTypesGridView = props => {
     resultSet: projectTypes,
     totalCount,
     currentPageNum: pageNum,
-    pageSize: 50,
+    pageSize,
     infiniteAutoload,
     infiniteScroll: true,
     setInfiniteAutoload,
     applyFilters,
-    entityName: 'project types',
+    entityName: 'project type',
     entityNamePlural: 'project types'
   }
 
@@ -138,9 +138,9 @@ ProjectTypesGridView.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.bool.isRequired,
   // onPageChange: PropTypes.func.isRequired,
-  // sortHandler: PropTypes.func.isRequired,
+  sortHandler: PropTypes.func.isRequired,
   pageNum: PropTypes.number.isRequired,
-  // criteria: PropTypes.object.isRequired,
+  criteria: PropTypes.object.isRequired,
   projectTypes: PropTypes.array.isRequired,
 }
 
