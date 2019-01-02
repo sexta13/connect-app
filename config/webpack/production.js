@@ -4,7 +4,7 @@
 const path = require('path')
 const webpackMerge = require('webpack-merge')
 const CompressionPlugin = require('compression-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const dirname = path.resolve(__dirname, '../..')
 
