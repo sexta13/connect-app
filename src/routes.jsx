@@ -6,7 +6,6 @@ import Home from './components/Home/Home'
 import ConnectTerms from './components/ConnectTerms/ConnectTerms'
 import CoderBot from './components/CoderBot/CoderBot'
 import projectRoutes from './projects/routes.jsx'
-import formBuilderRoutes from './routes/form-builder/routes.jsx'
 import notificationsRoutes from './routes/notifications/routes.jsx'
 import settingsRoutes from './routes/settings/routes.jsx'
 import metaDataRoutes from './routes/metadata/routes.jsx'
@@ -150,7 +149,6 @@ class Routes extends React.Component {
         {/* {reportsListRoutes} */}
         {notificationsRoutes}
         {settingsRoutes}
-        {formBuilderRoutes}
         {metaDataRoutes}
 
         <Route path="/error" render={renderApp(topBarWithProjectsToolBar, <CoderBot code={500}/>)} />
