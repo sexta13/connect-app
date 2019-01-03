@@ -13,7 +13,7 @@ module.exports = function (config) {
    */
   const jsxRule = config.module.rules.find(rule => /jsx/.test(rule.test.toString()))
   jsxRule.exclude = [
-    /node_modules[\\/](?!appirio-tech.*|topcoder|tc-|react-json-editor-ajrm)/,
+    /node_modules[\\/](?!appirio-tech.*|topcoder|tc-)/,
     /src[\\/]assets[\\/]fonts/
   ]
 
