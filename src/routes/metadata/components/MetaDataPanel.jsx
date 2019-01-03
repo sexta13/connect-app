@@ -64,7 +64,7 @@ class MetaDataPanel extends React.Component {
   }
 
   init(props) {
-    const { metadata, metadataType, isNew, templates } = props
+    const { metadataType, isNew, templates } = props
     this.setState({
       project: {
         details: {appDefinition: {}}, version: 'v2'

@@ -80,7 +80,6 @@ class TemplateForm extends Component {
   }
 
   getField(field, isRequired=true) {
-    const { metadataType } = this.props
     const { values } = this.state
     const validations = null
     const type = field['type']
