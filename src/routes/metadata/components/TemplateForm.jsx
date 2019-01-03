@@ -90,10 +90,9 @@ class TemplateForm extends Component {
     const isCheckbox = type === 'checkbox'
     const isTextBox = !isDropdown && !isCheckbox && !isObject && !isJSON
     const options = isDropdown ? field['options'] : []
-    const selectedOption = isDropdown ? field['selectedOption'] : null
-    let value
+    let value = field['value']
     let isReadOnly = false
-    if (values) {
+    if (values && values[label]) {
       value = field['type'] === 'object' ? JSON.stringify(values[label]) : values[label]
       if (values.hasOwnProperty('id') && label === 'id') {
         if (!this.props.isNew) {
@@ -105,8 +104,6 @@ class TemplateForm extends Component {
           isReadOnly = true
         }
       }
-    } else {
-      value = null
     }
 
     return (
@@ -134,7 +131,7 @@ class TemplateForm extends Component {
                 options={options}
                 theme="default"
                 onSelect={ this.onChangeDropdown }
-                value={selectedOption.value}
+                value={value}
                 required
               />
             </div>

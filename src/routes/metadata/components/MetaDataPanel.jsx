@@ -17,6 +17,179 @@ import { SCREEN_BREAKPOINT_MD } from '../../../config/constants'
 
 import './MetaDataPanel.scss'
 
+const phasesDefaultValue = {
+  '1-dev-iteration-i': {
+    name: 'Dev Iteration',
+    products: [
+      {
+        productKey: 'development-iteration-5-milestones',
+        id: 29
+      }
+    ],
+    duration: 25
+  }
+}
+const sectionsDefaultValue = [
+  {
+    id: 'appDefinition',
+    title: 'Sample Project',
+    required: true,
+    description: 'Please answer a few basic questions about your project and, as an option, add links to supporting documents in the “Notes” section. If you have any files to upload, you’ll be able to do so later.',
+    subSections: [
+      {
+        id: 'projectName',
+        required: true,
+        validationError: 'Please provide a name for your project',
+        fieldName: 'name',
+        description: '',
+        title: 'Project Name',
+        type: 'project-name'
+      },
+      {
+        id: 'questions',
+        required: true,
+        hideTitle: true,
+        title: 'Questions',
+        description: '',
+        type: 'questions',
+        questions: [
+          {
+            id: 'projectInfo',
+            validations: 'isRequired,minLength:160',
+            validationErrors: {
+              isRequired: 'Please provide a description',
+              minLength: 'Please enter at least 160 characters'
+            },
+            fieldName: 'description',
+            description: 'Brief Description',
+            title: 'Description',
+            type: 'textbox'
+          },
+          {
+            icon: 'question',
+            required: true,
+            validationError: 'Please let us know consumers of your application',
+            title: 'What type of question you want to see next?',
+            description: 'Description for the radio button type question',
+            type: 'radio-group',
+            fieldName: 'details.appDefinition.questionType',
+            options: [
+              {
+                value: 'checkbox-group',
+                label: 'Checkbox Group'
+              },
+              {
+                value: 'slide-radiogroup',
+                label: 'Slide Radio Group'
+              },
+              {
+                value: 'tiled-radio-group',
+                label: 'Tiled Radio Group'
+              }
+            ]
+          },
+          {
+            icon: 'question',
+            required: true,
+            validationError: 'Validation error for tiled radio group question',
+            title: 'Sample tiled radio group question?',
+            description: 'Description for tiled radio group question',
+            fieldName: 'details.appDefinition.sampleTiledRadioGroup',
+            type: 'tiled-radio-group',
+            condition: 'details.appDefinition.questionType == \'tiled-radio-group\'',
+            options: [
+              {
+                value: 'value1',
+                title: 'Value 1',
+                icon: 'icon-test-unstructured',
+                iconOptions: {
+                  fill: '#00000'
+                },
+                desc: ''
+              },
+              {
+                value: 'value2',
+                title: 'Value 2',
+                icon: 'icon-test-structured',
+                iconOptions: {
+                  fill: '#00000'
+                },
+                desc: ''
+              },
+              {
+                value: 'value3',
+                title: 'Value 3',
+                icon: 'icon-dont-know',
+                iconOptions: {
+                  fill: '#00000'
+                },
+                desc: ''
+              }
+            ]
+          },
+          {
+            icon: 'question',
+            title: 'Sample Checkbox group type question',
+            description: 'Description for checkbox group type question',
+            fieldName: 'details.appDefinition.sampleCheckboxGroup',
+            type: 'checkbox-group',
+            condition: 'details.appDefinition.questionType == \'checkbox-group\'',
+            options: [
+              {
+                value: 'value1',
+                label: 'Value 1'
+              },
+              {
+                value: 'value2',
+                label: 'Value 2'
+              }
+            ]
+          },
+          {
+            icon: 'question',
+            description: 'How much budget do you have?',
+            title: 'Sample Slide Radio Group type question',
+            fieldName: 'details.appDefinition.sampleSlideRadioGroup',
+            type: 'slide-radiogroup',
+            condition: 'details.appDefinition.questionType == \'slide-radiogroup\'',
+            options: [
+              {
+                value: 'upto-25',
+                title: 'Under $25K '
+              },
+              {
+                value: 'upto-50',
+                title: '$25K to $50K'
+              },
+              {
+                value: 'upto-75',
+                title: '$50K to $75K'
+              },
+              {
+                value: 'upto-100',
+                title: '$75K to $100K'
+              },
+              {
+                value: 'above-100',
+                title: 'More than $100K'
+              }
+            ],
+            required: true,
+            validationError: 'Please provide value for sample radio group question'
+          }
+        ]
+      },
+      {
+        id: 'notes',
+        fieldName: 'details.appDefinition.notes',
+        title: 'Notes',
+        description: 'Add any other important information regarding your project (e.g. links to documents or existing applications)',
+        type: 'notes'
+      }
+    ]
+  }
+]
+
 class MetaDataPanel extends React.Component {
   constructor(props) {
     super(props)
@@ -83,10 +256,10 @@ class MetaDataPanel extends React.Component {
     const { metadata : dirtyMetadata } = this.state
     if (isNew && !metadata && !dirtyMetadata) {
       if (metadataType === 'projectTemplate') {
-        return { scope: {} }
+        return { scope: { sections: sectionsDefaultValue } }
       }
       if (metadataType === 'productTemplate') {
-        return { template: {} }
+        return { template: { questions: sectionsDefaultValue } }
       }
       return {}
     }
@@ -128,14 +301,14 @@ class MetaDataPanel extends React.Component {
     const metadata = this.getMetadata(props)
     if (metadataType === 'productTemplate') {
       const prodCatOptions = this.getProductCategoryOptions(templates.productCategories)
-      const catSelectedOption = metadata.category ? { value: metadata.category } : prodCatOptions[0]
-      const subCatSelectedOption = metadata.subCategory ? { value: metadata.subCategory } : prodCatOptions[0]
+      const categoryValue = metadata.category ? metadata.category : prodCatOptions[0].value
+      const subCategoryValue = metadata.subCategory ? metadata.subCategory : prodCatOptions[0].value
       fields = fields.concat([
         { key: 'id', type: 'number' },
         { key: 'name', type: 'text' },
         { key: 'productKey', type: 'text' },
-        { key: 'category', type: 'dropdown', options: prodCatOptions, selectedOption: catSelectedOption },
-        { key: 'subCategory', type: 'dropdown', options: prodCatOptions, selectedOption: subCatSelectedOption },
+        { key: 'category', type: 'dropdown', options: prodCatOptions, value: categoryValue },
+        { key: 'subCategory', type: 'dropdown', options: prodCatOptions, value: subCategoryValue },
         { key: 'icon', type: 'text' },
         { key: 'brief', type: 'text' },
         { key: 'details', type: 'text' },
@@ -145,17 +318,17 @@ class MetaDataPanel extends React.Component {
       ])
     } else if (metadataType === 'projectTemplate') {
       const projectTypeOptions = this.getProductCategoryOptions(templates.projectTypes)
-      const selectedOption = metadata.category ? { value: metadata.category } : projectTypeOptions[0]
+      const value = metadata.category ? metadata.category : projectTypeOptions[0].value
       fields = fields.concat([
         { key: 'id', type: 'number' },
         { key: 'name', type: 'text' },
         { key: 'key', type: 'text' },
-        { key: 'category', type: 'dropdown', options: projectTypeOptions, selectedOption },
+        { key: 'category', type: 'dropdown', options: projectTypeOptions, value },
         { key: 'icon', type: 'text' },
         { key: 'question', type: 'text' },
         { key: 'info', type: 'text' },
         { key: 'aliases', type: 'array' },
-        { key: 'phases', type: 'json' },
+        { key: 'phases', type: 'json', value: phasesDefaultValue },
         { key: 'disabled', type: 'checkbox' },
         { key: 'hidden', type: 'checkbox' },
       ])
