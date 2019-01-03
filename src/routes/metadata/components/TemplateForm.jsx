@@ -70,8 +70,8 @@ class TemplateForm extends Component {
     primaryKeyValue = metadata && !metadata.hasOwnProperty('id') ? metadata['key'] : primaryKeyValue
 
     this.setState({
-      productCategories: metadataType === 'productTemplate' ? this.getProductCategoryOptions() : [],
-      projectTypes: metadataType === 'projectTemplate' ? this.getProjectTypeOptions() : [],
+      // productCategories: metadataType === 'productTemplate' ? this.getProductCategoryOptions() : [],
+      // projectTypes: metadataType === 'projectTemplate' ? this.getProjectTypeOptions() : [],
       values: isNew && !metadata ? {} : metadata,
       name,
       primaryKeyType: type,
@@ -79,33 +79,19 @@ class TemplateForm extends Component {
     })
   }
 
-  getProductCategoryOptions() {
-    const { productCategories } = this.props
-    return _.map(productCategories, (category) => {
-      return {
-        value: category.key,
-        title: category.displayName
-      }
-    })
-
-  }
-
-  getProjectTypeOptions() {
-    const { projectTypes } = this.props
-    return _.map(projectTypes, (type) => {
-      return {
-        value: type.key,
-        title: type.displayName
-      }
-    })
-  }
-
   getField(field, isRequired=true) {
     const { metadataType } = this.props
-    const { values, productCategories, projectTypes } = this.state
+    const { values } = this.state
     const validations = null
     const type = field['type']
     const label = field['key']
+    const isDropdown = type === 'dropdown'
+    const isObject = type === 'object'
+    const isJSON = type === 'json'
+    const isCheckbox = type === 'checkbox'
+    const isTextBox = !isDropdown && !isCheckbox && !isObject && !isJSON
+    const options = isDropdown ? field['options'] : []
+    const selectedOption = isDropdown ? field['selectedOption'] : null
     let value
     let isReadOnly = false
     if (values) {
@@ -126,9 +112,9 @@ class TemplateForm extends Component {
 
     return (
       <div className="field" key={label}>
-        <div className="label">{`${type !== 'checkbox' ? label : ''}`}</div>
+        <div className="label">{`${!isCheckbox ? label : ''}`}</div>
         {
-          type !== 'checkbox' && label !== 'category' && type !== 'object' && type !== 'json' && (
+          isTextBox && (
             <TCFormFields.TextInput
               wrapperClass="input-field"
               type={type}
@@ -142,21 +128,21 @@ class TemplateForm extends Component {
           )
         }
         {
-          type === 'text' && label === 'category' && (
+          isDropdown && (
             <div className="dropdown-field">
               <SelectDropdown
-                name="category"
-                options={ metadataType === 'productTemplate' ? productCategories : projectTypes}
+                name={label}
+                options={options}
                 theme="default"
                 onSelect={ this.onChangeDropdown }
-                value={value}
+                value={selectedOption.value}
                 required
               />
             </div>
           )
         }
         {
-          type === 'checkbox' && (
+          isCheckbox && (
             <div className="checkbox">
               <TCFormFields.Checkbox
                 ref={label}
@@ -168,7 +154,7 @@ class TemplateForm extends Component {
           )
         }
         {
-          type === 'object' && (
+          isObject && (
             <TCFormFields.Textarea
               wrapperClass="textarea-field"
               name={label}
@@ -179,7 +165,7 @@ class TemplateForm extends Component {
           )
         }
         {
-          type === 'json' && (
+          isJSON && (
             <div className="json_editor_wrapper">
               <JSONInput
                 id={ `${label}JSON` }
@@ -275,6 +261,7 @@ class TemplateForm extends Component {
 
   onChange(currentValues, isChanged) {
     const { changeTemplate } = this.props
+    console.log(currentValues)
     this.setState({ dirty: isChanged })
     if (currentValues.hasOwnProperty('metadata')) {
       try {
@@ -328,14 +315,7 @@ class TemplateForm extends Component {
           onChange={this.onChange}
         >
           {
-            _.map(fields, (field) => {
-              if (this.props.isNew && field.key !== 'id') {
-                return this.getField(field)
-              } else if (!this.props.isNew){
-                return this.getField(field)
-              }
-
-            })
+            _.map(fields, (field) => this.getField(field))
           }
           <div className="controls">
             <button

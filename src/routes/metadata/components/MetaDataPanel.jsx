@@ -33,6 +33,8 @@ class MetaDataPanel extends React.Component {
     }
     this.init = this.init.bind(this)
     this.getMetadata = this.getMetadata.bind(this)
+    this.getProjectTypeOptions = this.getProjectTypeOptions.bind(this)
+    this.getProductCategoryOptions = this.getProductCategoryOptions.bind(this)
     this.getResourceNameFromType = this.getResourceNameFromType.bind(this)
     this.renderSection = this.renderSection.bind(this)
     this.onJSONEdit = this.onJSONEdit.bind(this)
@@ -68,7 +70,7 @@ class MetaDataPanel extends React.Component {
         details: {appDefinition: {}}, version: 'v2'
       },
       dirtyProject: {details: {}, version: 'v2'},
-      fields: this.getFields(metadata, metadataType),
+      fields: this.getFields(props),
       metadata: this.getMetadata(props),
       metadataType,
       isNew,
@@ -98,18 +100,42 @@ class MetaDataPanel extends React.Component {
     return type + 's'
   }
 
+  getProductCategoryOptions(productCategories) {
+    return _.map(productCategories, (category) => {
+      return {
+        value: category.key,
+        title: category.displayName
+      }
+    })
+
+  }
+
+  getProjectTypeOptions(projectTypes) {
+    return _.map(projectTypes, (type) => {
+      return {
+        value: type.key,
+        title: type.displayName
+      }
+    })
+  }
+
   /**
    * get all fields of metadata
    */
-  getFields(metadata, metadataType) {
+  getFields(props) {
+    const { metadataType, templates } = props
     let fields = []
+    const metadata = this.getMetadata(props)
     if (metadataType === 'productTemplate') {
+      const prodCatOptions = this.getProductCategoryOptions(templates.productCategories)
+      const catSelectedOption = metadata.category ? { value: metadata.category } : prodCatOptions[0]
+      const subCatSelectedOption = metadata.subCategory ? { value: metadata.subCategory } : prodCatOptions[0]
       fields = fields.concat([
         { key: 'id', type: 'number' },
         { key: 'name', type: 'text' },
         { key: 'productKey', type: 'text' },
-        { key: 'category', type: 'text' },
-        { key: 'subCategory', type: 'text' },
+        { key: 'category', type: 'dropdown', options: prodCatOptions, selectedOption: catSelectedOption },
+        { key: 'subCategory', type: 'dropdown', options: prodCatOptions, selectedOption: subCatSelectedOption },
         { key: 'icon', type: 'text' },
         { key: 'brief', type: 'text' },
         { key: 'details', type: 'text' },
@@ -118,11 +144,13 @@ class MetaDataPanel extends React.Component {
         { key: 'hidden', type: 'checkbox' },
       ])
     } else if (metadataType === 'projectTemplate') {
+      const projectTypeOptions = this.getProductCategoryOptions(templates.projectTypes)
+      const selectedOption = metadata.category ? { value: metadata.category } : projectTypeOptions[0]
       fields = fields.concat([
         { key: 'id', type: 'number' },
         { key: 'name', type: 'text' },
         { key: 'key', type: 'text' },
-        { key: 'category', type: 'text' },
+        { key: 'category', type: 'dropdown', options: projectTypeOptions, selectedOption },
         { key: 'icon', type: 'text' },
         { key: 'question', type: 'text' },
         { key: 'info', type: 'text' },
