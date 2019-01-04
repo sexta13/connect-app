@@ -16,6 +16,7 @@ import CoderBroken from '../../../assets/icons/coder-broken.svg'
 import { SCREEN_BREAKPOINT_MD } from '../../../config/constants'
 
 import './MetaDataPanel.scss'
+import FullScreenJSONEditor from './FullScreenJSONEditor'
 
 const phasesDefaultValue = {
   '1-dev-iteration-i': {
@@ -202,7 +203,8 @@ class MetaDataPanel extends React.Component {
       isNew: false,
       isProcessing: false,
       project: {},
-      fields: []
+      fields: [],
+      isFullScreen: false
     }
     this.init = this.init.bind(this)
     this.getMetadata = this.getMetadata.bind(this)
@@ -210,6 +212,8 @@ class MetaDataPanel extends React.Component {
     this.getProductCategoryOptions = this.getProductCategoryOptions.bind(this)
     this.getResourceNameFromType = this.getResourceNameFromType.bind(this)
     this.renderSection = this.renderSection.bind(this)
+    this.enterFullScreen = this.enterFullScreen.bind(this)
+    this.exitFullScreen = this.exitFullScreen.bind(this)
     this.onJSONEdit = this.onJSONEdit.bind(this)
     this.onCreate = this.onCreate.bind(this)
 
@@ -474,6 +478,14 @@ class MetaDataPanel extends React.Component {
     }
   }
 
+  enterFullScreen() {
+    this.setState({ isFullScreen : true })
+  }
+
+  exitFullScreen() {
+    this.setState({ isFullScreen : false })
+  }
+
   renderSection(section, idx) {
     return (
       <div key={idx}>
@@ -503,7 +515,7 @@ class MetaDataPanel extends React.Component {
 
   render() {
     const { isAdmin, metadataType, templates } = this.props
-    const { fields, metadata, isNew } = this.state
+    const { fields, metadata, isNew, isFullScreen } = this.state
     let template = {}
     let templateSections = []
     let needTemplatePreview = false
@@ -533,6 +545,15 @@ class MetaDataPanel extends React.Component {
 
     return (
       <div className="meta-data-panel">
+        {
+          isFullScreen && (
+            <FullScreenJSONEditor
+              onExit={this.exitFullScreen}
+              onJSONEdit={this.onJSONEdit}
+              json={template}
+            />
+          )
+        }
         { needTemplatePreview && 
           <div className="content">
             {
@@ -559,13 +580,14 @@ class MetaDataPanel extends React.Component {
         <aside className="filters">
           { (metadata || isNew) && (['projectTemplate', 'productTemplate'].indexOf(metadataType) !== -1)  && (
             <div className="json_editor_wrapper">
+              <button type="button" className="tc-btn tc-btn-primary tc-btn-sm maximize-btn" onClick={this.enterFullScreen}>Maximize</button>
               <JSONInput
                 id="templateJSON"
                 placeholder ={ template }
                 theme="dark_vscode_tribute"
                 locale={ locale }
                 height="450px"
-                // width='0px'
+                // width='340px'
                 onChange={this.onJSONEdit}
               />
               {/* <ReactJson

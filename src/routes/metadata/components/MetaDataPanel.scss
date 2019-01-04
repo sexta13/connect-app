@@ -31,6 +31,12 @@
 
       .json_editor_wrapper {
         overflow: scroll;
+        display: flex;
+        flex-direction: column;
+
+        .maximize-btn {
+          align-self: flex-end;
+        }
       }
     }
 
