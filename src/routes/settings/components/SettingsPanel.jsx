@@ -23,11 +23,11 @@ const SettingsPanel = (props) => (
           if (matches) {
             return (
               <Sticky top={60}>
-                <SettingsSidebar selected={props.title}/>
+                <SettingsSidebar user={props.user}/>
               </Sticky>
             )
           } else {
-            return <SettingsSidebar selected={props.title}/>
+            return <SettingsSidebar user={props.user}/>
           }
         }}
       </MediaQuery>

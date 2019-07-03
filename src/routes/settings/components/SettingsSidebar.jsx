@@ -1,60 +1,45 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import UserSummary from '../../../components/UserSummary/UserSummary'
+import MenuList from '../../../components/MenuList/MenuList'
+import FileIcon from '../../../assets/icons/file.svg'
 
-import FooterV2 from '../../../components/FooterV2/FooterV2'
+import styles from './SettingsSidebar.scss'
 
-import './SettingsSidebar.scss'
+const settings = [
+  {label: 'All Projects',
+    to:'/projects?sort=updatedAt%20desc',
+    Icon: FileIcon},
+  {
+    label: 'My Profile',
+    to: '/settings/profile',
+    Icon: FileIcon
+  },
+  {
+    label: 'Notifications',
+    to: '/settings/notifications',
+    Icon: FileIcon
+  },
+  {
+    label: 'Account & Security',
+    to: '/settings/account',
+    Icon: FileIcon
+  }, ]
 
-const settings = [{
-  name: 'My profile',
-  path: '/settings/profile'
-}, {
-  name: 'Account and security',
-  path: '/settings/account'
-}, {
-  name: 'Notifications',
-  path: '/settings/notifications'
-}]
 
-const getOption = (selected, setting) => {
-  const selectedStyle = (setting.name === selected) ? 'selected-option' : ''
+const Sidebar = ({user}) => {
   return (
-    <Link to={setting.path} key={setting.name}>
-      <div styleName={'options ' + selectedStyle}>
-        {setting.name}
-      </div>
-    </Link>
-  )
-}
-
-const getMobileOption = (selected, setting) => {
-  const selectedStyle = (setting.name === selected) ? 'selected' : ''
-  return (
-    <Link to={setting.path} key={setting.name}>
-      <div styleName={'option-mobile ' + selectedStyle}>
-        {setting.name}
-      </div>
-      {(setting.name === selected) &&
-        <div styleName="option-highlight"/>
-      }
-    </Link>
-  )
-}
-
-const Sidebar = ({selected}) => {
-  return (
-    <div styleName="container">
-      <div styleName="sidebar">
-        <div styleName="title">
-          TOPCODER SETTINGS
+    <div className={styles.container}>
+      <div className={styles.sidebar}>
+        <div className={styles.userSummary}>
+          <UserSummary user={user} counters={{ active: 4, draft: 7, delivered:5 }} />
         </div>
-        {settings.map(getOption.bind(this, selected))}
-        <div styleName="footer">
-          <FooterV2 />
+        <hr className={styles.separator} />
+        <div className={styles.system}>
+          <div className={styles.systemTitle}>SYSTEM</div>
+          <div className={styles.menuList}>
+            <MenuList navLinks={settings}/>
+          </div>
         </div>
-      </div>
-      <div styleName="topbar">
-        {settings.map(getMobileOption.bind(this, selected))}
       </div>
     </div>
   )
