@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import SelectDropdown from 'appirio-tech-react-components/components/SelectDropdown/SelectDropdown'
 import cn from 'classnames'
 import { PROJECT_STATUS_COMPLETED, PROJECT_STATUS_CANCELLED } from '../../config/constants'
-
+import '../Modal/Modal.scss'
+import './ProjectStatus.scss'
 import './ProjectStatusChangeConfirmation.scss'
 
 class ProjectStatusChangeConfirmation extends Component {

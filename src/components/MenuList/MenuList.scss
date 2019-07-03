@@ -1,0 +1,14 @@
+@import "~tc-ui/src/styles/tc-includes";
+
+.container {
+  background-color: $tc-gray-05;
+}
+
+.navList {
+  padding: $base-unit * 4 0;
+}
+
+.line {
+  border-top: 1px solid $tc-gray-10;
+  margin: 0 $base-unit * 4;
+}

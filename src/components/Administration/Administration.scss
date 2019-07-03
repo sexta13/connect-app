@@ -1,0 +1,58 @@
+@import "~tc-ui/src/styles/tc-includes";
+
+:global {
+  .administration-container {
+    background-color: $tc-gray-05;
+    padding: $base-unit $base-unit * 4;
+  }
+  .section {
+    border-top: 1px solid $tc-gray-10;
+  }
+  .title {
+    @include roboto-bold;
+    padding-top: 20px;
+    color: $tc-gray-50;
+    font-weight: 400;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-size: $tc-label-xxs;
+    line-height: $base-unit * 4;
+  }
+  .project-status {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding: 5px 0;
+
+    .panel {
+      // avoid double padding for editable project status
+      padding: 0;
+    }
+
+    svg {
+      margin-top: 7px;
+      display: inline-block;
+    }
+
+    .status-header {
+      .status-label {
+        text-transform: uppercase;
+        line-height: 30px;
+      }
+    }
+
+    .caret {
+      margin-top: 3px;
+    }
+
+    .project-progress {
+      display: flex;
+
+      .progress-text {
+        text-transform: uppercase;
+        margin-left: 10px;
+        line-height: 16px;
+      }
+    }
+  }
+}

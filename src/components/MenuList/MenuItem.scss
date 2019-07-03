@@ -1,0 +1,56 @@
+@import "~tc-ui/src/styles/tc-includes";
+
+.roundCorners {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 44px;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: $base-unit $base-unit * 4;
+  height: $base-unit * 8;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+.label {
+  @include roboto;
+  font-size: $tc-label-sm;
+  padding: $base-unit $base-unit * 4;
+}
+
+.active {
+  .top,
+  .bottom {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    background-color: $tc-gray-neutral-dark;
+  }
+  .top {
+    top: -2px;
+  }
+  .bottom {
+    bottom: -2px;
+  }
+  .right {
+    right: -16px;
+  }
+
+  .menuItem {
+    background-color: $tc-gray-neutral-dark;
+  }
+  path {
+    fill: $tc-dark-blue-100;
+  }
+  .label {
+    @include roboto-bold;
+  }
+}

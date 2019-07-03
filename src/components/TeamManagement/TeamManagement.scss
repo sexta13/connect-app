@@ -389,18 +389,21 @@
   }
 
   .team-management-container {
-    background: $tc-white;
+    background: $tc-gray-05;
     padding: $base-unit $base-unit*4;
     box-shadow: none;
 
     .projects-team {
       margin: $base-unit*3 0;
+      border-top: 1px solid $tc-gray-10;
 
       .title {
         @include roboto-bold;
-        color: $tc-black;
+        color: $tc-gray-50;
+        font-weight: 400;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
-        font-size: $tc-label-xs;
+        font-size: $tc-label-xxs;
         line-height: $base-unit*4;
       }
 
@@ -408,7 +411,9 @@
         @include roboto;
         float: right;
         color: $tc-dark-blue;
+        font-size: $tc-label-xxs;
         cursor: pointer;
+        text-transform: capitalize;
       }
 
       .members {

@@ -1,20 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, NavLink } from 'react-router-dom'
 import update from 'react-addons-update'
 import _ from 'lodash'
-import LinksMenu from '../../../components/LinksMenu/LinksMenu'
-import FileLinksMenu from '../../../components/LinksMenu/FileLinksMenu'
+import TailLeft from '../../../assets/icons/arrows-16px-1_tail-left.svg'
+import MenuListContainer from './MenuListContainer'
 import TeamManagementContainer from './TeamManagementContainer'
+import Administration from '../../../components/Administration/Administration'
 import { updateProject, deleteProject } from '../../actions/project'
 import { loadDashboardFeeds, loadProjectMessages } from '../../actions/projectTopics'
 import { loadPhaseFeed } from '../../actions/phasesTopics'
 import { loadProjectPlan } from '../../actions/projectPlan'
 import { setDuration } from '../../../helpers/projectHelper'
 import { PROJECT_ROLE_OWNER, PROJECT_ROLE_COPILOT, PROJECT_ROLE_MANAGER,
-  DIRECT_PROJECT_URL, SALESFORCE_PROJECT_LEAD_LINK, PROJECT_STATUS_CANCELLED, PROJECT_ATTACHMENTS_FOLDER,
-  PROJECT_FEED_TYPE_PRIMARY, PHASE_STATUS_DRAFT, PROJECT_FEED_TYPE_MESSAGES } from '../../../config/constants'
+  DIRECT_PROJECT_URL, SALESFORCE_PROJECT_LEAD_LINK, PROJECT_STATUS_CANCELLED,
+  PHASE_STATUS_DRAFT} from '../../../config/constants'
 import PERMISSIONS from '../../../config/permissions'
 import { checkPermission } from '../../../helpers/permissions'
 import ProjectInfo from '../../../components/ProjectInfo/ProjectInfo'
@@ -23,6 +24,7 @@ import {
   removeProjectAttachment
 } from '../../actions/projectAttachment'
 import { saveFeedComment } from '../../actions/projectTopics'
+import styles from './ProjectInfoContainer.scss'
 
 class ProjectInfoContainer extends React.Component {
 
@@ -395,10 +397,8 @@ class ProjectInfoContainer extends React.Component {
   render() {
     const { duration } = this.state
     const { project, currentMemberRole, isSuperUser, phases, feeds,
-      hideInfo, hideLinks, hideMembers, onChannelClick, activeChannelId, productsTimelines,
-      isManageUser, phasesTopics, isProjectPlan, isProjectProcessing, projectTemplates,
-      attachmentsAwaitingPermission, addProjectAttachment, discardAttachments, attachmentPermissions,
-      changeAttachmentPermission, projectMembers, loggedInUser, isSharingAttachment, canAccessPrivatePosts } = this.props
+      hideInfo, hideMembers, productsTimelines,
+      isManageUser, phasesTopics, isProjectProcessing } = this.props
     let directLinks = null
     // check if direct links need to be added
     const isMemberOrCopilot = _.indexOf([PROJECT_ROLE_COPILOT, PROJECT_ROLE_MANAGER], currentMemberRole) > -1
@@ -413,7 +413,6 @@ class ProjectInfoContainer extends React.Component {
     }
 
     const canDeleteProject = currentMemberRole === PROJECT_ROLE_OWNER && project.status === 'draft'
-    const canManageLinks = !!currentMemberRole || isSuperUser
 
     let devices = []
     const primaryTarget = _.get(project, 'details.appDefinition.primaryTarget')
@@ -467,39 +466,7 @@ class ProjectInfoContainer extends React.Component {
       })
     )
 
-    const discussions = [...feeds, ...phaseFeeds].map((feed) => ({
-      title: feed.phaseName ? `${feed.phaseName}` : `${feed.title}`,
-      address: (feed.tag === PROJECT_FEED_TYPE_PRIMARY || feed.tag === PROJECT_FEED_TYPE_MESSAGES) ? `/projects/${project.id}#feed-${feed.id}` : `/projects/${project.id}/plan#phase-${feed.phaseId}-posts`,
-      noNewPage: true,
-      //if PRIMARY discussion is to be loaded for project-plan page we won't attach the callback, for smoother transition to dashboard page
-      onClick: !(isProjectPlan && (feed.tag === PROJECT_FEED_TYPE_PRIMARY || feed.tag === PROJECT_FEED_TYPE_MESSAGES)) && onChannelClick ? () => onChannelClick(feed) : null,
-      allowDefaultOnClick: true,
-      isActive: feed.id === activeChannelId,
-    }))
 
-    const attachmentsStorePath = `${PROJECT_ATTACHMENTS_FOLDER}/${project.id}/`
-    let enableFileUpload = true
-    if(project.version !== 'v2') {
-      const templateId = _.get(project, 'templateId')
-      const projectTemplate = _.find(projectTemplates, template => template.id === templateId)
-      enableFileUpload = _.some(projectTemplate.scope.sections, section => {
-        return _.some(section.subSections, subSection => subSection.id === 'files')
-      })
-    }
-
-    // extract links from posts
-    const topicLinks = this.extractLinksFromPosts(feeds)
-    const publicTopicLinks = topicLinks.filter(link => link.tag !== PROJECT_FEED_TYPE_MESSAGES)
-    const privateTopicLinks = topicLinks.filter(link => link.tag === PROJECT_FEED_TYPE_MESSAGES)
-    const phaseLinks = this.extractLinksFromPosts(phaseFeeds)
-
-    let links = []
-    links = links.concat(project.bookmarks)
-    links = links.concat(publicTopicLinks)
-    if (canAccessPrivatePosts) {
-      links = links.concat(privateTopicLinks)
-    }
-    links = links.concat(phaseLinks)
 
     // extract attachment from posts
     attachments = [
@@ -511,6 +478,11 @@ class ProjectInfoContainer extends React.Component {
     return (
       <div>
         <div className="sideAreaWrapper">
+          <div className={styles.allProjects}>
+            <NavLink to="/projects">
+              <TailLeft className={styles.iconTailLeft} />
+              <span>All Projects</span></NavLink>
+          </div>
           {!hideInfo &&
             <ProjectInfo
               project={project}
@@ -527,46 +499,15 @@ class ProjectInfoContainer extends React.Component {
               isProjectProcessing={isProjectProcessing}
             />
           }
-          <LinksMenu
-            links={discussions}
-            title="Discussions"
-            moreText="view all"
-            noDots
-            withHash
+
+          <MenuListContainer  />
+
+          <Administration directLinks={directLinks} phases={phases} project={project}
+            currentMemberRole={currentMemberRole} onChangeStatus={this.onChangeStatus}
+            isSuperUser={isSuperUser} canEditStatus
+            duration={duration}
           />
-          {enableFileUpload &&
-            <FileLinksMenu
-              links={attachments}
-              title="Files"
-              onDelete={this.removeAttachment}
-              onEdit={this.onEditAttachment}
-              onAddNewLink={this.onAddFile}
-              onAddAttachment={addProjectAttachment}
-              onUploadAttachment={this.onUploadAttachment}
-              isSharingAttachment={isSharingAttachment}
-              discardAttachments={discardAttachments}
-              onChangePermissions={changeAttachmentPermission}
-              selectedUsers={attachmentPermissions}
-              projectMembers={projectMembers}
-              pendingAttachments={attachmentsAwaitingPermission}
-              loggedInUser={loggedInUser}
-              moreText="view all files"
-              noDots
-              attachmentsStorePath={attachmentsStorePath}
-              onDeletePostAttachment={this.deletePostAttachment}
-            />
-          }
-          {!hideLinks &&
-            <LinksMenu
-              links={links}
-              canDelete={canManageLinks}
-              canEdit={canManageLinks}
-              canAdd={canManageLinks}
-              onAddNewLink={this.onAddNewLink}
-              onDelete={this.onDeleteLink}
-              onEdit={this.onEditLink}
-            />
-          }
+
           {!hideMembers &&
             <TeamManagementContainer projectId={project.id} members={project.members} />
           }

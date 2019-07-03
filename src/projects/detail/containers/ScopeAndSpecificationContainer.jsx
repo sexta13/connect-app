@@ -11,13 +11,15 @@ import _ from 'lodash'
 import Sticky from '../../../components/Sticky'
 import MediaQuery from 'react-responsive'
 
-import ProjectSpecSidebar from '../components/ProjectSpecSidebar'
+import ProjectInfoContainer from './ProjectInfoContainer'
 import EditProjectForm from '../components/EditProjectForm'
 import TwoColsLayout from '../../../components/TwoColsLayout'
 import {
   SCREEN_BREAKPOINT_MD,
   PROJECT_ATTACHMENTS_FOLDER,
   EVENT_TYPE,
+  PROJECT_FEED_TYPE_PRIMARY,
+  PROJECT_FEED_TYPE_MESSAGES,
 } from '../../../config/constants'
 import { updateProject, fireProjectDirty, fireProjectDirtyUndo } from '../../actions/project'
 import { addProjectAttachment, updateProjectAttachment, removeProjectAttachment } from '../../actions/projectAttachment'
@@ -25,6 +27,8 @@ import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import NotificationsReader from '../../../components/NotificationsReader'
 import ProjectEstimation from '../../create/components/ProjectEstimation'
 import { getProjectProductTemplates } from '../../../helpers/templates'
+import { checkPermission } from '../../../helpers/permissions'
+import PERMISSIONS from '../../../config/permissions'
 
 // This handles showing a spinner while the state is being loaded async
 const enhance = spinnerWhileLoading(props => !props.processing)
@@ -84,13 +88,32 @@ class SpecificationContainer extends Component {
       allProductTemplates,
       productCategories,
       estimationQuestion,
+      phases,
+      feeds,
+      isFeedsLoading,
+      phasesTopics,
+      isProcessing,
+      productsTimelines,
+      isManageUser,
     } = this.props
     const editPriv = isSuperUser ? isSuperUser : !!currentMemberRole
 
     const attachmentsStorePath = `${PROJECT_ATTACHMENTS_FOLDER}/${project.id}/`
 
     const leftArea = (
-      <ProjectSpecSidebar project={project} sections={template.sections} currentMemberRole={currentMemberRole} />
+      <ProjectInfoContainer
+        location={location}
+        currentMemberRole={currentMemberRole}
+        project={project}
+        phases={phases}
+        isSuperUser={isSuperUser}
+        isManageUser={isManageUser}
+        feeds={feeds}
+        isFeedsLoading={isFeedsLoading}
+        productsTimelines={productsTimelines}
+        phasesTopics={phasesTopics}
+        isProjectProcessing={isProcessing}
+      />
     )
 
     return (
@@ -105,7 +128,7 @@ class SpecificationContainer extends Component {
           <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
             {(matches) => {
               if (matches) {
-                return <Sticky top={110}>{leftArea}</Sticky>
+                return <Sticky top={60}>{leftArea}</Sticky>
               } else {
                 return leftArea
               }
@@ -157,8 +180,13 @@ SpecificationContainer.propTypes = {
   ])
 }
 
-const mapStateToProps = ({projectState, loadUser, templates}) => {
+const mapStateToProps = ({projectState, loadUser, projectTopics, templates, phasesTopics}) => {
   const { projectTemplates, productTemplates } = templates
+
+  let allFeed = projectTopics.feeds[PROJECT_FEED_TYPE_PRIMARY].topics
+  if (checkPermission(PERMISSIONS.ACCESS_PRIVATE_POST)) {
+    allFeed = [...allFeed, ...projectTopics.feeds[PROJECT_FEED_TYPE_MESSAGES].topics]
+  }
 
   return {
     processing: projectState.processing,
@@ -173,6 +201,11 @@ const mapStateToProps = ({projectState, loadUser, templates}) => {
     ) : [],
     productCategories: templates.productCategories,
     allProductTemplates: productTemplates,
+    phases: projectState.phases,
+    feeds: allFeed,
+    isFeedsLoading: projectTopics.isLoading,
+    phasesTopics,
+    isProcessing: projectState.processing,
   }
 }
 

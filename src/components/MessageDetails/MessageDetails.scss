@@ -1,14 +1,13 @@
-@import '~tc-ui/src/styles/tc-includes';
+@import "~tc-ui/src/styles/tc-includes";
 
 :global {
-  .message-details{
+  .message-details {
     min-height: 700px;
     padding-bottom: 70px;
-    .messaging-comment-section{
+    .messaging-comment-section {
       position: absolute;
       bottom: 20px;
       width: 100%;
     }
   }
 }
-  

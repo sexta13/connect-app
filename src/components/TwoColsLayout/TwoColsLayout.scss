@@ -9,12 +9,11 @@
 }
 
 .sidebar {
-  background-color: $tc-white;
-  box-shadow: 1px 1px 0 0 $tc-gray-10, 0 1px 0 0 $tc-gray-10;
+  background-color: $tc-gray-05;;
   min-height: calc(100vh - 110px); /* minus primary and secondary toolbar height */
   padding-bottom: 10 * $base-unit;
   position: relative;
-  width: 360px;
+  width: 280px;
 
   .no-secondary-toolbar & {
     min-height: calc(100vh - 60px); /* minus primary toolbar height only */
