@@ -13,6 +13,7 @@ const MenuItem = ({ navLink }) => {
         className={styles.navItem}
         activeClassName={styles.active}
         exact
+        isActive={(_, { pathname }) => navLink.to.split('?')[0] === pathname}
       >
         <Icon className={styles.icon} />
         {navLink.label}

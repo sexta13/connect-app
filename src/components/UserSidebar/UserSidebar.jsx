@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import UserSummary from '../../../components/UserSummary/UserSummary'
-import MenuList from '../../../components/MenuList/MenuList'
-import FileIcon from '../../../assets/icons/file.svg'
+import UserSummary from '../UserSummary/UserSummary'
+import MenuList from '../MenuList/MenuList'
+import FileIcon from '../../assets/icons/file.svg'
 
-import './SettingsSidebar.scss'
+import './UserSidebar.scss'
 
 const navLinks = [{
   label: 'ALL PROJECTS',
@@ -24,7 +24,7 @@ const navLinks = [{
   Icon: FileIcon
 }]
 
-const Sidebar = ({user}) => {
+const UserSidebar = ({user}) => {
   return (
     <div styleName="container">
       <div className="sideAreaWrapper">
@@ -39,8 +39,8 @@ const Sidebar = ({user}) => {
   )
 }
 
-Sidebar.propTypes = {
+UserSidebar.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-export default Sidebar
+export default UserSidebar

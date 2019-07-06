@@ -15,7 +15,11 @@ import _ from 'lodash'
 import querystring from 'query-string'
 import { updateProject } from '../../../actions/project'
 import { getNewProjectLink } from '../../../../helpers/projectHelper'
-import { ROLE_CONNECT_MANAGER, ROLE_CONNECT_ACCOUNT_MANAGER, ROLE_CONNECT_COPILOT, ROLE_ADMINISTRATOR,
+import TwoColsLayout from '../../../../components/TwoColsLayout'
+import Sticky from '../../../../components/Sticky'
+import UserSidebar from '../../../../components/UserSidebar/UserSidebar'
+import MediaQuery from 'react-responsive'
+import { SCREEN_BREAKPOINT_MD, ROLE_CONNECT_MANAGER, ROLE_CONNECT_ACCOUNT_MANAGER, ROLE_CONNECT_COPILOT, ROLE_ADMINISTRATOR,
   ROLE_CONNECT_ADMIN, PROJECT_STATUS, PROJECT_STATUS_CANCELLED,
   PROJECT_LIST_DEFAULT_CRITERIA, PROJECTS_LIST_VIEW, PROJECTS_LIST_PER_PAGE } from '../../../../config/constants'
 
@@ -110,7 +114,7 @@ class Projects extends Component {
     } else {
       // perform initial load only if there are not projects already loaded or only one projects
       // otherwise we will get projects duplicated in store
-      if (projects.length <= 1 || refresh) {        
+      if (projects.length <= 1 || refresh) {
         this.routeWithParams(criteria)
       }
     }
@@ -231,21 +235,21 @@ class Projects extends Component {
     } else if (chosenView === PROJECTS_LIST_VIEW.CARD) {
       projectsView = cardView
     }
-    
-    return (
+
+    const rightArea = (
       <div>
         <section className="">
           <div className="container">
             {!showWalkThrough && (
-              <ProjectListNavHeader 
-                applyFilters={this.applyFilters} 
-                selectedView={chosenView} 
-                changeView={setProjectsListView} 
-                currentStatus={currentStatus} 
-                criteria={criteria} 
-                setInfiniteAutoload={setInfiniteAutoload} 
-                loadProjects={loadProjects} 
-                history={history} 
+              <ProjectListNavHeader
+                applyFilters={this.applyFilters}
+                selectedView={chosenView}
+                changeView={setProjectsListView}
+                currentStatus={currentStatus}
+                criteria={criteria}
+                setInfiniteAutoload={setInfiniteAutoload}
+                loadProjects={loadProjects}
+                history={history}
                 isCustomer={isCustomer}
               />
             )}
@@ -257,6 +261,31 @@ class Projects extends Component {
           </div>
         </section>
       </div>
+    )
+
+
+
+    return (
+      <TwoColsLayout noPadding>
+        <TwoColsLayout.Sidebar>
+          <MediaQuery minWidth={SCREEN_BREAKPOINT_MD}>
+            {(matches) => {
+              if (matches) {
+                return (
+                  <Sticky top={60}>
+                    <UserSidebar user={this.props.currentUser}/>
+                  </Sticky>
+                )
+              } else {
+                return <UserSidebar user={this.props.currentUser}/>
+              }
+            }}
+          </MediaQuery>
+        </TwoColsLayout.Sidebar>
+        <TwoColsLayout.Content>
+          {rightArea}
+        </TwoColsLayout.Content>
+      </TwoColsLayout>
     )
   }
 }
@@ -278,7 +307,10 @@ const mapStateToProps = ({ projectSearch, members, loadUser, projectState, templ
       firstName: loadUser.user.firstName,
       lastName: loadUser.user.lastName,
       roles: loadUser.user.roles,
-      email: loadUser.user.email
+      email: loadUser.user.email,
+      createdAt: loadUser.user.createdAt,
+      photoURL: loadUser.user.photoURL,
+      handle: loadUser.user.handle
     },
     orgConfig   : loadUser.orgConfig,
     isLoading   : projectSearch.isLoading,

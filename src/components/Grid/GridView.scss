@@ -557,7 +557,7 @@
     }
   }
 
-  @media screen and (max-width: 1180px - 1px) {
+  @media screen and (max-width: 1640px - 1px) {
     .flex-data {
       .flex-row .flex-item-title.item-id {
         display: none;
@@ -570,7 +570,7 @@
     }
   }
 
-  @media screen and (max-width: 1160px - 1px) {
+  @media screen and (max-width: 1570px - 1px) {
     .flex-data {
       .flex-row .flex-item-title.item-manager {
         display: none;
@@ -578,7 +578,7 @@
     }
   }
 
-  @media screen and (max-width: 1024px - 1px) {
+  @media screen and (max-width: 1470px - 1px) {
     .flex-data {
       .flex-row .flex-item-title.item-status {
         display: none;
@@ -586,7 +586,23 @@
     }
   }
 
-  @media screen and (max-width: $screen-rg - 1px) {
+  @media screen and (max-width: 1400px - 1px) {
+    .flex-data {
+      .flex-row .flex-item-title.item-join {
+        display: none;
+      }
+    }
+  }
+
+  @media screen and (max-width: $screen-lg - 1px) {
+    .flex-data {
+      .flex-row .flex-item-title.item-customer {
+        display: none;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1120px - 1px) {
     .flex-data {
       .row .flex-item-title {
         display: none;
