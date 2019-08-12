@@ -1,0 +1,44 @@
+@import '~tc-ui/src/styles/tc-includes';
+
+.container {
+  display: flex;
+  margin-top: 30px;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  height: 30px;
+  align-items: center;
+}
+
+.title {
+  @include roboto-bold;
+
+  flex: 1;
+  margin-right: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: $tc-gray-90;
+  font-size: 16px;
+  line-height: 30px;
+}
+.content {
+    font-size: 14px;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    margin-top:20px;
+}
+
+.input-design-works {
+    @include roboto-bold;
+    flex-shrink: 0;
+    font-size: 12px !important;
+    letter-spacing: 0.8px !important;
+    font-weight: 700 !important;
+  }

@@ -11,8 +11,9 @@ const Formsy = FormsyForm.Formsy
 import Section from '../Section'
 import WorkViewEdit from './WorkViewEdit'
 import WorkTimelineContainer from '../../containers/WorkTimelineContainer'
-import CloseIcon from  '../../../../assets/icons/x-mark-black.svg'
-import EditIcon from  '../../../../assets/icons/icon-edit-black.svg'
+import DesignWorksOverviewContainer from '../../containers/DesignWorksOverviewContainer'
+import CloseIcon from '../../../../assets/icons/x-mark-black.svg'
+import EditIcon from '../../../../assets/icons/icon-edit-black.svg'
 import SelectDropdown from '../../../../components/SelectDropdown/SelectDropdown'
 import { PHASE_STATUS } from '../../../../config/constants'
 import LoadingIndicator from '../../../../components/LoadingIndicator/LoadingIndicator'
@@ -24,13 +25,13 @@ const phaseStatuses = PHASE_STATUS.map(ps => ({
 }))
 
 class WorkView extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {
       isEditing: false,
       selectedNav: 0,
-      navs:[
+      navs: [
         { title: 'Details' },
         { title: 'Requirements' },
         { title: 'Delivery Management' },
@@ -46,7 +47,7 @@ class WorkView extends React.Component {
     this.getTabContent = this.getTabContent.bind(this)
   }
 
-  componentWillMount() {
+  componentWillMount () {
     const { work } = this.props
     // reupdate selected nav  when reshow component
     if (work && work.selectedNav) {
@@ -60,7 +61,7 @@ class WorkView extends React.Component {
    * @param change changed form model in flattened form
    * @param isChanged flag that indicates if form actually changed from initial model values
    */
-  handleChange(change, isChanged) {
+  handleChange (change, isChanged) {
     if (isChanged) {
       const { match: { params: { projectId, workstreamId, workId } }, updateWork } = this.props
       updateWork(projectId, workstreamId, workId, change)
@@ -71,7 +72,7 @@ class WorkView extends React.Component {
    * Call request to submit edit form
    * @param {Object} model form value
    */
-  submitEditForm(model) {
+  submitEditForm (model) {
     const { match: { params: { projectId, workstreamId, workId } }, updateWork } = this.props
     updateWork(projectId, workstreamId, workId, model)
   }
@@ -79,11 +80,14 @@ class WorkView extends React.Component {
   /**
    * Get selected tab content
    */
-  getTabContent() {
+  getTabContent () {
     const { navs, selectedNav } = this.state
-    const { work,  addNewMilestone, editMilestone } = this.props
+    const { work, addNewMilestone, editMilestone } = this.props
     if (navs[selectedNav].title === 'Details') {
-      return (<WorkTimelineContainer workId={work.id} editMode={false} />)
+      return (<div>
+        <WorkTimelineContainer workId={work.id} editMode={false} />
+        <DesignWorksOverviewContainer workId={work.id}/>
+      </div>)
     }
     if (navs[selectedNav].title === 'Delivery Management') {
       return (
@@ -102,7 +106,7 @@ class WorkView extends React.Component {
     )
   }
 
-  render() {
+  render () {
     const {
       work,
       match,
@@ -136,7 +140,7 @@ class WorkView extends React.Component {
               </div>
               {!_.isNil(work) && (
                 <Formsy.Form
-                  onChange={ this.handleChange }
+                  onChange={this.handleChange}
                   ref="form"
                 >
                   <div styleName="status-dropdown">

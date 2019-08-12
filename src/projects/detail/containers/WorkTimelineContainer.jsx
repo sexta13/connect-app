@@ -12,25 +12,24 @@ import { withRouter } from 'react-router-dom'
 import WorkTimeline from '../components/work-timeline/WorkTimeline'
 import spinnerWhileLoading from '../../../components/LoadingSpinner'
 import { loadWorkTimelines } from '../../actions/workTimelines'
+import * as workTimelineSelectors from '../../selectors/workTimelines'
 
 const spinner = spinnerWhileLoading(props => !props.isLoadingTimelines)
 const EnhancedCreateView = spinner(WorkTimeline)
 
 
 class WorkTimelineContainer extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
 
-  componentWillMount() {
+  componentDidMount () {
     // load timeline
-    const { loadWorkTimelines, loadedTimelinesWorkId, workId } = this.props
-    if (loadedTimelinesWorkId !== workId) {
-      loadWorkTimelines(workId)
-    }
+    const { workTimelines, loadWorkTimelines, workId } = this.props
+    _.isEmpty(workTimelines) && loadWorkTimelines(workId)
   }
 
-  render() {
+  render () {
     return (
       <EnhancedCreateView
         {...this.props}
@@ -56,11 +55,12 @@ WorkTimelineContainer.PropTypes = {
   loadWorkTimelines: PT.func.isRequired,
 }
 
-const mapStateToProps = ({ workTimelines }) => {
+const mapStateToProps = (state, { workId }) => {
   return {
-    timelines: workTimelines.timelines,
-    loadedTimelinesWorkId: workTimelines.workId, // work id that already loaded timelines
-    isLoadingTimelines: workTimelines.isLoading,
+    timelines: workTimelineSelectors.getTimelinesByWorkId(state, workId),
+    loadedTimelinesWorkId: workId, // work id that already loaded timelines
+    isLoadingTimelines: workTimelineSelectors.isLoadingWorkTimelineByWorkId(state, workId),
+    workingTimelines: workTimelineSelectors.getWorkTimelinesByWorkId(state, workId),
   }
 }
 

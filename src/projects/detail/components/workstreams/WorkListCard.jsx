@@ -7,25 +7,31 @@ import { withRouter } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
 import ChatIcon from '../../../../assets/icons/icon-chat-pastel-crimson.svg'
+import InputDesignContainer from '../../containers/InputDesignContainer'
 import { PHASE_STATUS } from '../../../../config/constants'
 import './WorkListCard.scss'
 
 
-const WorkListCard = ({workstream, work, match}) => (
-  <Link to={`/projects/${match.params.projectId}/workstreams/${workstream.id}/works/${work.id}`} styleName="container">
-    <div styleName="left">
-      <div styleName="title-container">
-        <span styleName="title">{work.name}</span>
-        <span styleName="status">{_.find(PHASE_STATUS, ['value', work.status]).name}</span>
+const WorkListCard = ({ workstream, work, match }) => (
+  <div styleName="container">
+    <Link to={`/projects/${match.params.projectId}/workstreams/${workstream.id}/works/${work.id}`} styleName="link">
+      <div styleName="left">
+        <div styleName="title-container">
+          <span styleName="title">{work.name}</span>
+          <span styleName="status">{_.find(PHASE_STATUS, ['value', work.status]).name}</span>
+        </div>
+        <span styleName="description">{work.description}</span>
       </div>
-      <span styleName="description">{work.description}</span>
+      <div styleName="right">
+        <ChatIcon />
+        {/* Show the random value of unread messages */}
+        <span styleName="message-counter">45</span>
+      </div>
+    </Link>
+    <div styleName="btn-container">
+      <InputDesignContainer workId={work.id} />
     </div>
-    <div styleName="right">
-      <ChatIcon />
-      {/* Show the random value of unread messages */}
-      <span styleName="message-counter">45</span>
-    </div>
-  </Link>
+  </div>
 )
 
 WorkListCard.defaultProps = {

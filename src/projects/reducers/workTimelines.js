@@ -18,9 +18,11 @@ import {
   GET_PROJECTS_SUCCESS,
 } from '../../config/constants'
 
-import {parseErrorObj} from '../../helpers/workstreams'
+import { parseErrorObj } from '../../helpers/workstreams'
 
-const initialState = {
+const initialState = {}
+
+const byWorkIdinitialState = {
   isLoading: false,
   isLoadingMilestoneInfo: false,
   isUpdatingMilestoneInfo: false,
@@ -32,31 +34,42 @@ const initialState = {
   milestone: null,
 }
 
-export const workTimelines = function (state=initialState, action) {
+export const workTimelines = function (state = initialState, action) {
 
   switch (action.type) {
   case LOAD_WORK_TIMELINE_PENDING:
-    return Object.assign({}, state, {
-      isLoading: true,
-      error: false
-    })
+    return {
+      ...state, [action.meta]: {
+        ...byWorkIdinitialState,
+        isLoading: true,
+        error: false
+      }
+    }
+
   case LOAD_WORK_TIMELINE_SUCCESS:
-    for(const timeline of action.payload.timelines) {
+    for (const timeline of action.payload.timelines) {
       if (!timeline.milestones) {
         timeline.milestones = []
       }
     }
-    return Object.assign({}, state, {
-      isLoading: false,
-      error: false,
-      timelines: action.payload.timelines,
-      workId: action.payload.workId
-    })
+    return {
+      ...state,
+      [action.meta]: {
+        isLoading: false,
+        error: false,
+        timelines: action.payload.timelines,
+        workId: action.payload.workId,
+      }
+    }
+
   case LOAD_WORK_TIMELINE_FAILURE:
-    return Object.assign({}, state, {
-      isLoading: false,
-      error: parseErrorObj(action)
-    })
+    return {
+      ...state,
+      [action.meta]: {
+        isLoading: false,
+        error: parseErrorObj(action),
+      }
+    }
   case NEW_WORK_TIMELINE_MILESTONE_PENDING:
     return Object.assign({}, state, {
       isCreatingMilestoneInfo: true,
@@ -134,10 +147,10 @@ export const workTimelines = function (state=initialState, action) {
       error: parseErrorObj(action)
     })
 
-  // when we clear the project we have to put dashboard state to the initial state
-  // because the code relies on the initial state
-  // for example spinnerWhileLoading in ProjectDerail.jsx expects `isLoading` to be true
-  // to prevent components which require dashboard data from rendering
+    // when we clear the project we have to put dashboard state to the initial state
+    // because the code relies on the initial state
+    // for example spinnerWhileLoading in ProjectDerail.jsx expects `isLoading` to be true
+    // to prevent components which require dashboard data from rendering
   case CLEAR_LOADED_PROJECT:
   case GET_PROJECTS_SUCCESS:
     return Object.assign({}, state, initialState)

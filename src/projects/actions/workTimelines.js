@@ -25,6 +25,7 @@ export function loadWorkTimelines(workId) {
   return (dispatch) => {
     return dispatch({
       type: LOAD_WORK_TIMELINE,
+      meta: workId,
       payload: getTimelinesByReference('work', workId).then(timelines => ({ timelines, workId }))
     })
   }
